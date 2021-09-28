@@ -35,11 +35,12 @@ public class DxHash implements ConsistentHash
      * Constructor with parameters.
      *
      * @param nodes    initial cluster nodes
+     * @param capacity overall capacity of the cluster (max number of nodes)
      */
-    public DxHash( Collection<? extends Node> nodes )
+    public DxHash( Collection<? extends Node> nodes, int capacity )
     {
 
-        this( nodes, DEFAULT_HASH_FUNCTION );
+        this( nodes, capacity, DEFAULT_HASH_FUNCTION );
 
     }
 
@@ -47,17 +48,19 @@ public class DxHash implements ConsistentHash
      * Constructor with parameters.
      *
      * @param nodes        initial cluster nodes
+     * @param capacity     overall capacity of the cluster (max number of nodes)
      * @param hashFunction the hash function to use
      */
-    public DxHash( Collection<? extends Node> nodes, HashFunction hashFunction )
+    public DxHash( Collection<? extends Node> nodes, int capacity, HashFunction hashFunction )
     {
 
         super();
 
         Require.nonEmpty( nodes, "The cluster must have at least one node" );
+        Require.toHold( nodes.size() <= capacity, "The cluster overall capacity cannot be smaller than the number of working nodes" );
         
         this.engine = new DxEngine(
-            0, Require.nonNull( hashFunction, "The hash function to use cannot be null" )
+            0, capacity, Require.nonNull( hashFunction, "The hash function to use cannot be null" )
         );
 
         this.indirection = new Indirection( nodes.size() );
@@ -100,6 +103,7 @@ public class DxHash implements ConsistentHash
     {
 
         Require.nonEmpty( toAdd, "The resources to add are mandatory" );
+        Require.toHold( engine.size() + toAdd.size() <= engine.capacity(), "No room for more resources" );
         for( Node node : toAdd )
         {
 

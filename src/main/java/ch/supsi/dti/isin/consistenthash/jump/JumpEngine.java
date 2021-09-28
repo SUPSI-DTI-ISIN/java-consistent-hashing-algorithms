@@ -15,6 +15,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
  * to avoid the performance tests to be falsified.
  *
  * @author Massimo Coluzzi
+ * @author Davide Bertacco
  */
 public class JumpEngine
 {

@@ -99,7 +99,7 @@ public interface ConsistentHash
 
             case ANCHOR_HASH: return new AnchorHash( nodes, nodes.size() << 1, hash );
 
-            case DX_HASH: return new DxHash( nodes, hash );
+            case DX_HASH: return new DxHash( nodes, nodes.size() << 1, hash );
 
             case JUMP_HASH: return new JumpHash( nodes, hash ); 
 

@@ -18,6 +18,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
  * to avoid the performance tests to be falsified.
  *
  * @author Massimo Coluzzi
+ * @author Davide Bertacco
  */
 public class DxEngine
 {
@@ -45,19 +46,22 @@ public class DxEngine
      * Constructor with parameters.
      * 
      * @param nodes        initial cluster nodes
+     * @param capacity     overall number of available buckets
      * @param hashFunction the hash function to use
      */
-    public DxEngine( int size, HashFunction hashFunction )
+    public DxEngine( int size, int capacity, HashFunction hashFunction )
     {
 
         super();
 
         this.size = size;
-        this.capacity = size;
+        this.capacity = capacity;
 
-        this.failed = new BitSet( size );
         this.removed = new LinkedList<>();
-        this.hashFunction = hashFunction;   
+        this.hashFunction = hashFunction;
+
+        this.failed = new BitSet( capacity );
+        this.failed.set( size, capacity );
 
     }
 
@@ -100,17 +104,9 @@ public class DxEngine
          * If the stack is not empty takes the last removed bucket.
          * Otherwise, uses the next available bucket (with index 'size').
          */
-        final int b;
-        if( ! removed.isEmpty() )
-        {
-            b = removed.pop();
-            failed.clear( b );
-        }
-        else
-            b = size;
-
+        final int b = removed.isEmpty() ? size : removed.pop();
+        failed.clear( b );
         ++size;
-        capacity = capacity < size ? size : capacity;
 
         return b;
 
@@ -127,7 +123,6 @@ public class DxEngine
 
         /* Updates the size of the working set. */
         --size;
-
         failed.set( b );
         removed.push( b );
         

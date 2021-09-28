@@ -15,8 +15,8 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
  * This class is not performing any consistency check
  * to avoid the performance tests to be falsified.
  * 
- * 
  * @author Massimo Coluzzi
+ * @author Davide Bertacco
  */
 public class RendezvousEngine
 {
