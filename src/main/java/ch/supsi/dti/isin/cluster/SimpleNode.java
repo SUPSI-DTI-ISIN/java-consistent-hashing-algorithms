@@ -32,7 +32,7 @@ public class SimpleNode implements Node
 
         super();
 
-        this.name = Require.nonBlank( name, "The name cannot be empty  or blank" );
+        this.name = Require.nonBlank( name, "The name cannot be empty or blank" );
 
     }
 
@@ -80,10 +80,10 @@ public class SimpleNode implements Node
      * @param size the number of nodes to create
      * @return a list of nodes
      */
-    public static List<SimpleNode> create( int size )
+    public static List<Node> create( int size )
     {
 
-        Require.toHold( size > 0, "The requested number of nodes must be strict positive" );
+        Require.toHold( size > 0, "The requested number of nodes must be strictly positive" );
         return IntStream
             .range( 0, size )
             .mapToObj( SimpleNode::of )

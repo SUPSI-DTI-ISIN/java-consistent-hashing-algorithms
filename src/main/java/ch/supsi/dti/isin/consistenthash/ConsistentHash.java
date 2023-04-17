@@ -55,6 +55,13 @@ public interface ConsistentHash
     void removeNodes( Collection<? extends Node> nodes );
 
     /**
+     * Tells if the algorithm supports the removal of random nodes.
+     * 
+     * @return {@code true} if nodes can be removed randomly
+     */
+    boolean supportsRandomRemovals();
+
+    /**
      * Returns the number of nodes in the cluster.
      * 
      * @return number of nodes in the cluster.

@@ -111,7 +111,7 @@ public class JumpHash implements ConsistentHash
 
             final int bucket = engine.size();
             this.indirection.put( node, bucket );
-            engine.increase();
+            engine.addBucket();
 
         }
         
@@ -132,9 +132,19 @@ public class JumpHash implements ConsistentHash
 
             final int bucket = indirection.remove( node );
             Require.toHold( bucket == engine.size() - 1, "Only the last inserted node can be removed" );
-            engine.decrease();
+            engine.removeBucket( bucket );
             
         }
+
+    }
+
+    /**
+     * {@inheritDoc}}
+     */
+    public boolean supportsRandomRemovals()
+    {
+
+        return false;
 
     }
 

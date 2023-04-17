@@ -12,6 +12,7 @@ import org.nerd4j.utils.lang.Require;
 public class XXHash implements HashFunction
 {
 
+    
     /** Internal implementation of the {@code XX32} algorithm. */
     private XXHash32 xxHash32;
 
@@ -34,6 +35,17 @@ public class XXHash implements HashFunction
     /*  INTERFACE METHODS  */
     /* ******************* */
 
+
+    /**
+     * {@inheritDoc}}
+     */
+    @Override
+    public String name()
+    {
+
+        return "XX";
+
+    }
 
     /**
      * {@inheritDoc}

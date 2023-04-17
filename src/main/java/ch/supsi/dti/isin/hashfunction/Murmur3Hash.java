@@ -3,6 +3,7 @@ package ch.supsi.dti.isin.hashfunction;
 import org.apache.commons.codec.digest.MurmurHash3;
 import org.nerd4j.utils.lang.Require;
 
+
 /**
  * {@code Murmur3} implementation of the {@link HashFunction} interface.
  * 
@@ -12,10 +13,33 @@ public class Murmur3Hash implements HashFunction
 {
 
 
+    /**
+     * Default constructor.
+     * 
+     */
+    public Murmur3Hash()
+    {
+
+        super();
+
+    }
+
+
     /* ******************* */
     /*  INTERFACE METHODS  */
     /* ******************* */
 
+
+    /**
+     * {@inheritDoc}}
+     */
+    @Override
+    public String name()
+    {
+
+        return "MurMur3";
+
+    }
 
     /**
      * {@inheritDoc}

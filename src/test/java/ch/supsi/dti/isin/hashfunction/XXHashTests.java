@@ -12,6 +12,21 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 public class XXHashTests implements HashFunctionContract<XXHash>
 {
     
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String expectedName()
+    {
+
+        return "XX";
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public XXHash sampleValue()
     {

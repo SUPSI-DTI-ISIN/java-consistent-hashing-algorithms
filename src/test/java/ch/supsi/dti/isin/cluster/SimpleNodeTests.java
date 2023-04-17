@@ -208,14 +208,14 @@ public class SimpleNodeTests implements NodeContract<SimpleNode>
     {
 
         final int size = random.nextInt( 100 ) + 1;
-        final List<SimpleNode> nodes = SimpleNode.create( size );
+        final List<Node> nodes = SimpleNode.create( size );
 
         assertNotNull( nodes );
         assertFalse( nodes.isEmpty() );
 
         for( int i = 0; i < size; ++i )
         {
-            final SimpleNode node = nodes.get( i );
+            final Node node = nodes.get( i );
 
             assertNotNull( node );
             assertEquals( "node_" + i, node.name() );

@@ -146,6 +146,16 @@ public class DxHash implements ConsistentHash
     }
 
     /**
+     * {@inheritDoc}}
+     */
+    public boolean supportsRandomRemovals()
+    {
+
+        return true;
+
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

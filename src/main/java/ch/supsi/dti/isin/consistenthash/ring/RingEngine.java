@@ -9,6 +9,7 @@ import java.util.function.BiConsumer;
 
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 
+
 /**
  * Implementation of the {@code RingHash} algorithm as described in the related paper:
  * {@code https://www.cs.princeton.edu/courses/archive/fall09/cos518/papers/chash.pdf}

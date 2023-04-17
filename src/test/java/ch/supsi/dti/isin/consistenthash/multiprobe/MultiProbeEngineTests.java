@@ -35,6 +35,16 @@ public class MultiProbeEngineTests
 
 
     @Test
+    public void the_number_of_probes_should_be_as_configured()
+    {
+
+        final int probes = random.nextInt( 100 ) + 1;
+        final MultiProbeEngine engine = new MultiProbeEngine( probes, ConsistentHash.DEFAULT_HASH_FUNCTION );
+        assertEquals( probes, engine.probes() );
+        
+    }
+
+    @Test
     public void adding_a_resource_should_change_the_size_of_the_ring()
     {
 

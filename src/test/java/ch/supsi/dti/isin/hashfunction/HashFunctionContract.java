@@ -2,7 +2,9 @@ package ch.supsi.dti.isin.hashfunction;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.ByteBuffer;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.nerd4j.utils.lang.Is;
 import org.nerd4j.utils.lang.RequirementFailure;
 
 import ch.supsi.dti.isin.Contract;
@@ -35,6 +38,32 @@ public interface HashFunctionContract<F extends HashFunction>extends Contract<F>
     /** Random values generator */
     static final Random random = new Random();
 
+
+    /**
+     * Returns the expected name for the tested function.
+     * 
+     * @return the expected name of the tested function.
+     */
+    String expectedName();
+
+
+    /* ******************************************* */
+    /*     TESTS FOR METHOD HashFunction.name()    */
+    /* ******************************************* */
+
+    @Test
+    default void the_function_name_must_be_as_expected()
+    {
+
+        final HashFunction function = sampleValue();
+        assertNotNull( function );
+
+        final String expectedName = expectedName();
+        assertFalse( Is.blank(expectedName) );
+
+        assertEquals( expectedName, function.name() );
+
+    }
 
     /* ******************************************* */
     /*  TESTS FOR METHOD HashFunction.hash(byte[]) */

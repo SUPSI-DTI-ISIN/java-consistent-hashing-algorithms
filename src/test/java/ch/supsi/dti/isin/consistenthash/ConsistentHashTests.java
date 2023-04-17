@@ -58,7 +58,7 @@ public class ConsistentHashTests
     public void for_each_algorithm_the_right_implementation_should_be_returned()
     {
 
-        final List<SimpleNode> nodes = SimpleNode.create( 10 );
+        final List<Node> nodes = SimpleNode.create( 10 );
         final Map<Algorithm,Class<?>> map = new HashMap<>();
         map.put( Algorithm.ANCHOR_HASH, AnchorHash.class );
         map.put( Algorithm.DX_HASH, DxHash.class );

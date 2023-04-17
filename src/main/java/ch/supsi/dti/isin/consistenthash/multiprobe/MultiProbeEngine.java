@@ -30,7 +30,7 @@ public class MultiProbeEngine
     private final List<Point> ring;
 
     /** The number of probes, by default {@link MultiProbeHash#DEFAULT_NUM_PROBES} */
-    private final int numProbes;
+    private final int probes;
 
     /** The hashing function to use. */
     private final HashFunction hashFunction;
@@ -39,16 +39,16 @@ public class MultiProbeEngine
     /**
      * Constructor with parameters.
      *
-     * @param numProbes Number of probes need to perform. The higher the number is, the more balanced
-     *                  the hash ring is.
+     * @param probes       number of probes need to perform. The higher the number is, the more balanced
+     *                     the hash ring is.
      * @param hashFunction the hash function to use.
      */
-    public MultiProbeEngine( int numProbes, HashFunction hashFunction )
+    public MultiProbeEngine( int probes, HashFunction hashFunction )
     {
 
         super();
 
-        this.numProbes =numProbes;
+        this.probes = probes;
         this.hashFunction = hashFunction;
 
         this.ring = new ArrayList<>();
@@ -103,6 +103,18 @@ public class MultiProbeEngine
         final int pos = Collections.binarySearch( ring, bucket );
             
         ring.remove( pos );
+        
+    }
+
+    /**
+     * Returns the number of probes.
+     * 
+     * @return the number of probes
+     */
+    public int probes()
+    {
+
+        return probes;
         
     }
 
@@ -167,7 +179,7 @@ public class MultiProbeEngine
 
         int index = 0;
         long minDistance = Long.MAX_VALUE;
-        for( int i = 0; i < numProbes; i++ )
+        for( int i = 0; i < probes; i++ )
         {
 
             final long hash = hashFunction.hash( key, i );

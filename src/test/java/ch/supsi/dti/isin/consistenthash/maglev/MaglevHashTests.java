@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -78,8 +78,8 @@ public class MaglevHashTests implements ConsistentHashContract<MaglevHash>
     public void initial_nodes_cannot_be_duplicated()
     {
 
-        final List<Node> nodes = Stream.of( 1, 1 )
-            .map( SimpleNode::of )
+        final List<Node> nodes = IntStream.of( 1, 1 )
+            .mapToObj( SimpleNode::of )
             .collect( toList() );
 
         assertThrows(
@@ -93,8 +93,8 @@ public class MaglevHashTests implements ConsistentHashContract<MaglevHash>
     public void the_lookup_table_size_must_be_prime()
     {
 
-        final List<Node> nodes = Stream.of( 1, 2 )
-            .map( SimpleNode::of )
+        final List<Node> nodes = IntStream.of( 1, 2 )
+            .mapToObj( SimpleNode::of )
             .collect( toList() );
 
         assertThrows(
@@ -108,8 +108,8 @@ public class MaglevHashTests implements ConsistentHashContract<MaglevHash>
     public void the_lookup_table_must_be_at_least_128_times_bigger_than_the_cluster()
     {
 
-        final List<Node> nodes = Stream.of( 1, 2 )
-            .map( SimpleNode::of )
+        final List<Node> nodes = IntStream.of( 1, 2 )
+            .mapToObj( SimpleNode::of )
             .collect( toList() );
 
         assertThrows(

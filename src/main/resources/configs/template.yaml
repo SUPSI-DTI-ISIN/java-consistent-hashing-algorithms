@@ -1,0 +1,169 @@
+# Configurations that will apply to every benchmark.
+common:
+    # Defines if the garbage collector should be called before every benchmark.
+    # Default value is true.
+    gc: true
+
+    # Folder containing the benchmark results.
+    output-folder: /tmp
+
+    # Number of times a single benchmark will be executed.
+    iterations:
+        # Number of non-recorded iterations of a benchmark. Used to warm up the JVM.
+        # The warm-up iterations will not be run for benchmarks that doesn't benefit from it.
+        # Default value is 5.
+        warmup: 5
+
+        # How many times a single benchmark will be executed.
+        # Default value is 5.
+        execution: 5
+
+    # Configurations that apply only to time based benchmarks.
+    time:
+        # The time unit the results refer to.
+        # Possible values are: SECONDS, MILLISECONDS, MICROSECONDS, NANOSECONDS
+        # Default is NANOSECONDS. 
+        unit: NANOSECONDS
+
+        # Defines how the execution time is measured.
+        # Possible values are: AverageTime, SampleTime, SingleShotTime, Throughput, ALL.
+        # Default is AverageTime.
+        # See org.openjdk.jmh.annotations.Mode for more details.
+        mode: AverageTime
+
+        # Number of seconds every warmup iteration should last.
+        # Default value is 5.
+        warmup: 5
+
+        # Number of seconds every execution iteration should last.
+        # Default value 5.
+        execution: 5
+    
+    # Number of initial active nodes.
+    # At least one positive value must be provided.
+    # Benchmarks will run for every specified cluster size.
+    init-nodes: [10, 100, 1000, 10000]
+
+    # Hash functions used by the consistent hashing algorithms.
+    # The list shows the currently implemented functions.
+    # Benchmarks will run for every specified function.
+    hash-functions:
+        - murmur3
+        - crc32
+        - md5
+        - xx
+
+# List of algorithms to be benchmarked. The list shows the currently implemented CH algorithms.
+# If you add an algorithm called MyAlgo, the tool will search for a class named "MyAlgoFactory"
+# that implements the ConsistentHashFactory interface. Every entry in the list must provide
+# the algorithm name and an optional list of arguments to use during creation.
+algorithms:
+    - name: dx
+      args: 
+          # The value is multiplied by the number of initial active nodes to find the capacity.
+          # E.g., capacity=10 means that the overall capacity of the cluster is 10 times the initial number of working nodes.
+          # Default value for the capacity is 10.
+          capacity: 10
+    - name: anchor
+      args:
+          # Same as above.
+          capacity: 10
+    - name: maglev
+      args:
+          # Number of entries per node in the lookup table.
+          # The size of the lookup table is the smallest prime number
+          # greater than <initial-number-of-nodes> * <permutations>.
+          # The system expectes the numnber of permutations to be at least 128.
+          # Default value is 128.
+          permutations: 128
+    - name: multi-probe
+      args:
+          # Number of times a key gets hashed during a lookup.
+          # Default value is 21
+          probes: 21
+    - name: rendezvous
+    - name: ring
+      args:
+          # Number of virtual nodes per physical node.
+          # Default value is 1000
+          virtualNodes: 1000
+    - name: jump
+
+
+# Lists the benchmarks to be executed.
+# The list shows the currently implemented benchmarks.
+benchmarks: 
+
+    # Benchmarks the time needed by an algorithm to initialize its internal data structure.
+    - name: init-time
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      args:
+
+    # Benchmarks the time needed to find which node a given key belongs.
+    - name: lookup-time
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      args:
+          # Statistical distributions of the keys.
+          # At least one distribution must be provided.
+          # Benchmarks will run for every specified key distribution.
+          distributions:
+            # Keys are distributed evenly across the range of values
+            - uniform
+            # Keys are distributed following a Gaussian curve.
+            - normal
+            # Keys are distributed following a custom curve.
+            # Custom keys are loaded from a text file (one per row).
+            - custom
+
+    # Benchmarks the time needed by the algorithm to update its internal data structure when the cluster get resized.
+    - name: resize-time
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      args:
+
+    # Benchmarks the amount of RAM (in bytes) used by the algorithm.
+    - name: memory-usage
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      args:
+
+    # Benchmarks the distribution of the keys among the nodes of the cluster.
+    - name: balance
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      args:
+        # The benchmark will be executed over a number of keys that is calculated by: keyMultiplier * cluster-nodes.
+        # Default value is 100.
+        keyMultiplier: 100
+
+    # Benchmarks the distribution of the keys among the nodes of the cluster after a resize.
+    - name: resize-balance
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      args:
+          # See keyMultiplier on BenchmarkBalance.
+          # Default value is 100.
+          keyMultiplier: 100 
+
+    # Benchmarks the ability of the algorithm to move the minimal number of keys after a resize.
+    - name: monotonicity
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      args:
+          # Percentage of nodes to remove. The provided value must be >= 0 and < 1).
+          # At least one value must be provided.
+          # The benchmark will run for every specified value.
+          fractions: [0.1, 0.3, 0.5]
+
+          # See keyMultiplier on BenchmarkBalance.
+          # Default value is 100.
+          keyMultiplier: 100

@@ -12,6 +12,16 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 public class CRC32HashTests implements HashFunctionContract<CRC32Hash>
 {
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String expectedName()
+    {
+
+        return "CRC32";
+
+    }
 
     /**
      * {@inheritDoc}

@@ -178,7 +178,16 @@ public class MaglevHash implements ConsistentHash
         engine.removeBackends( backends );
 
     }
-        
+    
+    /**
+     * {@inheritDoc}}
+     */
+    public boolean supportsRandomRemovals()
+    {
+
+        return true;
+
+    }
 
     /**
      * {@inheritDoc}

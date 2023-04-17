@@ -13,3 +13,6 @@ target/
 
 # Ignore Visual Studio Code project files.
 .vscode/
+
+# Ingnore Mac related folders
+.DS_Store

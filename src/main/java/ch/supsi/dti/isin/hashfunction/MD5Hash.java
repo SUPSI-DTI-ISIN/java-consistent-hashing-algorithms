@@ -3,6 +3,7 @@ package ch.supsi.dti.isin.hashfunction;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.nerd4j.utils.lang.Require;
 
+
 /**
  * {@code MD5} implementation of the {@link HashFunction} interface.
  * 
@@ -11,11 +12,34 @@ import org.nerd4j.utils.lang.Require;
 public class MD5Hash implements HashFunction
 {
 
+    
+    /**
+     * Default constructor.
+     * 
+     */
+    public MD5Hash()
+    {
+
+        super();
+
+    }
+
 
     /* ******************* */
     /*  INTERFACE METHODS  */
     /* ******************* */
 
+
+    /**
+     * {@inheritDoc}}
+     */
+    @Override
+    public String name()
+    {
+
+        return "MD5";
+
+    }
 
     /**
      * {@inheritDoc}

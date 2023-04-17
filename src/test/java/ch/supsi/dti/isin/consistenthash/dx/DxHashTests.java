@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -93,8 +92,8 @@ public class DxHashTests implements ConsistentHashContract<DxHash>
     public void initial_nodes_cannot_be_duplicated()
     {
 
-        final List<Node> nodes = Stream.of( 1, 1 )
-            .map( SimpleNode::of )
+        final List<Node> nodes = IntStream.of( 1, 1 )
+            .mapToObj( SimpleNode::of )
             .collect( toList() );
 
         assertThrows(

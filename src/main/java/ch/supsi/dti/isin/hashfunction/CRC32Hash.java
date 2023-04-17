@@ -4,6 +4,7 @@ import java.util.zip.CRC32;
 
 import org.nerd4j.utils.lang.Require;
 
+
 /**
  * {@code CRC32} implementation of the {@link HashFunction} interface.
  * 
@@ -13,13 +14,38 @@ public class CRC32Hash implements HashFunction
 {
 
     /** Internal implementation of the {@code CRC32} algorithm. */
-    private final CRC32 crc32 = new CRC32();
+    private final CRC32 crc32;
+
+
+    /**
+     * Default constructor.
+     * 
+     */
+    public CRC32Hash()
+    {
+
+        super();
+
+        this.crc32 = new CRC32();
+
+    }
 
     
     /* ******************* */
     /*  INTERFACE METHODS  */
     /* ******************* */
 
+
+    /**
+     * {@inheritDoc}}
+     */
+    @Override
+    public String name()
+    {
+
+        return "CRC32";
+
+    }
 
     /**
      * {@inheritDoc}

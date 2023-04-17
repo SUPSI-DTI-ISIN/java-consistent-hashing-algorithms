@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.nerd4j.utils.lang.Require;
 
+
 /**
  * Represents an hashing function to be used inside
  * a consistent hashing altorithm.
@@ -18,6 +19,13 @@ public interface HashFunction
     /*  INTERFACE METHODS  */
     /* ******************* */
 
+
+    /**
+     * Returns a printable name for the function.
+     * 
+     * @return a printable name for the function.
+     */
+    String name();
 
     /**
      * Performs the hashing of the given byte array.

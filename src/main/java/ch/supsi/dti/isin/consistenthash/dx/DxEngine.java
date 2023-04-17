@@ -5,6 +5,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Random;
 
+import ch.supsi.dti.isin.consistenthash.BucketBasedEngine;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 
 
@@ -20,7 +21,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
  * @author Massimo Coluzzi
  * @author Davide Bertacco
  */
-public class DxEngine
+public class DxEngine implements BucketBasedEngine
 {
     
     /** Working nodes. */

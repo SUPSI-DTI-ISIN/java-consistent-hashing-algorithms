@@ -12,7 +12,18 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 public class Murmur3HashTests implements HashFunctionContract<Murmur3Hash>
 {
 
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String expectedName()
+    {
+
+        return "MurMur3";
+
+    }
+
     /**
      * {@inheritDoc}
      */

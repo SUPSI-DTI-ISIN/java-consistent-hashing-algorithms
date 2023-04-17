@@ -10,6 +10,7 @@ import ch.supsi.dti.isin.cluster.Node;
 import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 
+
 /**
  * Wrapper to adapt the {@link RendezvousEngine} to the {@link ConsistentHash} interface.
  * 
@@ -132,6 +133,16 @@ public class RendezvousHash implements ConsistentHash
             nodeMap.remove( resource );
                 
         }
+
+    }
+
+    /**
+     * {@inheritDoc}}
+     */
+    public boolean supportsRandomRemovals()
+    {
+
+        return true;
 
     }
 

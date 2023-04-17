@@ -3,6 +3,7 @@ package ch.supsi.dti.isin.consistenthash.anchor;
 import java.util.Deque;
 import java.util.LinkedList;
 
+import ch.supsi.dti.isin.consistenthash.BucketBasedEngine;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 
 
@@ -18,7 +19,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
  * @author Massimo Coluzzi
  * @author Davide Bertacco
  */
-public class AnchorEngine
+public class AnchorEngine implements BucketBasedEngine
 {
 
     /** Common default seed to use during hashing of the nodes. */
@@ -111,7 +112,7 @@ public class AnchorEngine
         /* Loop until hitting a working bucket. */
         while( A[b] > 0 )
         {
-            /* We rehash the key using the buket as seed */
+            /* We rehash the key using the bucket as seed */
             k = Math.abs( hashFunction.hash(k,b,SEED) );
             
             int h = (int) (k % A[b]);

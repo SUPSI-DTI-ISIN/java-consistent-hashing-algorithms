@@ -2,6 +2,7 @@ package ch.supsi.dti.isin.consistenthash.jump;
 
 import com.google.common.hash.Hashing;
 
+import ch.supsi.dti.isin.consistenthash.BucketBasedEngine;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 
 
@@ -17,7 +18,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
  * @author Massimo Coluzzi
  * @author Davide Bertacco
  */
-public class JumpEngine
+public class JumpEngine implements BucketBasedEngine
 {
 
     /** Number of nodes in the cluster. */
@@ -66,10 +67,10 @@ public class JumpEngine
      * Increases the cluster size by one.
      * 
      */
-    public void increase()
+    public int addBucket()
     {
         
-        ++size;
+        return size++;
         
     }
 
@@ -77,10 +78,10 @@ public class JumpEngine
      * Decreases the cluster size by one.
      * 
      */
-    public void decrease()
+    public int removeBucket( int b )
     {
         
-        --size;
+        return --size;
         
     }
    

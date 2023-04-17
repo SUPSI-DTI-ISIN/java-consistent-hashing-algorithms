@@ -145,6 +145,16 @@ public class AnchorHash implements ConsistentHash
     }
 
     /**
+     * {@inheritDoc}}
+     */
+    public boolean supportsRandomRemovals()
+    {
+
+        return true;
+
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

@@ -11,6 +11,7 @@ import ch.supsi.dti.isin.cluster.Node;
 import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 
+
 /**
  * Wrapper to adapt the {@link RingEngine} to the {@link ConsistentHash} interface.
  * 
@@ -21,6 +22,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
  */
 public class RingHash implements ConsistentHash
 {
+    
     
     /**
      * The {@code RingHash} algorithm engine as described in:
@@ -159,6 +161,16 @@ public class RingHash implements ConsistentHash
     }
 
     /**
+     * {@inheritDoc}}
+     */
+    public boolean supportsRandomRemovals()
+    {
+
+        return true;
+
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -168,7 +180,6 @@ public class RingHash implements ConsistentHash
         return nodeMap.size();
 
     }
-
 
     /**
      * {@inheritDoc}

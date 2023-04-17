@@ -27,7 +27,7 @@ public class MultiProbeHash implements ConsistentHash
      * the number of probes to get the best balance between
      * performance and peak-to-average load ratio is 21.
      */
-    private static final int DEFAULT_NUM_PROBES = 21;
+    public static final int DEFAULT_PROBES = 21;
 
     /**
      * The {@code MaglevHash} algorithm engine as described in:
@@ -47,7 +47,7 @@ public class MultiProbeHash implements ConsistentHash
     public MultiProbeHash( Collection<? extends Node> nodes )
     {
 
-        this( nodes, DEFAULT_NUM_PROBES, DEFAULT_HASH_FUNCTION );
+        this( nodes, DEFAULT_PROBES, DEFAULT_HASH_FUNCTION );
 
     }
 
@@ -60,7 +60,7 @@ public class MultiProbeHash implements ConsistentHash
     public MultiProbeHash( Collection<? extends Node> nodes, HashFunction hashFunction )
     {
 
-        this( nodes, DEFAULT_NUM_PROBES, hashFunction );
+        this( nodes, DEFAULT_PROBES, hashFunction );
 
     }
 
@@ -162,6 +162,16 @@ public class MultiProbeHash implements ConsistentHash
 
             
         }
+
+    }
+
+    /**
+     * {@inheritDoc}}
+     */
+    public boolean supportsRandomRemovals()
+    {
+
+        return true;
 
     }
 

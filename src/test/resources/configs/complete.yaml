@@ -1,0 +1,136 @@
+# Configurations that will apply to every benchmark.
+common:
+    output-folder: /tmp
+    
+    iterations:
+        warmup: 5
+        run: 10
+
+    time:
+        unit: NANOSECONDS
+        mode: AverageTime
+        warmup: 5
+        execution: 5
+
+    init-nodes: [10, 100, 1000, 10000, 100000]
+
+    functions:
+    -   murmur3
+    -   crc32
+    -   md5
+    -   xx
+
+algorithms:
+-   name: Dx
+    args:
+        capacity: 10
+-   name: Anchor
+    args:
+        capacity: 10
+-   name: Maglev
+    args:
+        permutations: 128
+-   name: MultiProbe
+    args:
+        probes: 21
+-   name: Rendezvous
+-   name: Ring
+    args:
+        virtual-nodes: 1000
+-   name: Jump
+
+benchmarks: 
+-   name: BenchmarkInit
+    common:
+        output-folder: /tmp/time/init
+        iterations:
+            warmup: 10
+            run: 10
+        time:
+            unit: NANOSECONDS
+            mode: AverageTime
+            warmup: 5
+            execution: 5
+        init-nodes: [10, 100, 1000, 10000, 100000]
+        functions:
+        -   xx
+-   name: BenchmarkLookup
+    common:
+        output-folder: /tmp/time/lookup
+        iterations:
+            warmup: 10
+            run: 10
+        time:
+            unit: NANOSECONDS
+            mode: AverageTime
+            warmup: 5
+            execution: 5
+        init-nodes: [10, 100, 1000, 10000, 100000]
+        functions:
+        -   xx
+    args:
+        distributions:
+        -   uniform
+        -   normal
+        -   custom
+-   name: BenchmarkResizeTime
+    common:
+        output-folder: /tmp/time/resize
+        iterations:
+            warmup: 10
+            run: 10
+        time:
+            unit: NANOSECONDS
+            mode: AverageTime
+            warmup: 5
+            execution: 5
+        init-nodes: [10, 100, 1000, 10000, 100000]
+        functions:
+        -   xx
+-   name: BenchmarkMemory
+    common:
+        output-folder: /tmp/memory
+        iterations:
+            warmup: 1
+            run: 10
+        init-nodes: [10, 100, 1000, 10000, 100000]
+        functions:
+        -   xx
+-   name: BenchmarkBalance
+    common:
+        output-folder: /tmp/balance
+        iterations:
+            warmup: 1
+            run: 10
+        init-nodes: [10, 100, 1000, 10000, 100000]
+        functions:
+        -   murmur3
+        -   crc32
+        -   md5
+        -   xx
+-   name: BenchmarkResizeBalance
+    common:
+        output-folder: /tmp/resize-balance
+        iterations:
+            warmup: 1
+            run: 10
+        init-nodes: [10, 100, 1000, 10000, 100000]
+        functions:
+        -   murmur3
+        -   crc32
+        -   md5
+        -   xx
+-   name: BenchmarkMonotonicity
+    common:
+        output-folder: /tmp/monotonicity
+        iterations:
+            warmup: 1
+            run: 10
+        init-nodes: [10, 100, 1000, 10000, 100000]
+        functions:
+        -   murmur3
+        -   crc32
+        -   md5
+        -   xx
+    args:
+        fractions: [0.1, 0.3, 0.5]

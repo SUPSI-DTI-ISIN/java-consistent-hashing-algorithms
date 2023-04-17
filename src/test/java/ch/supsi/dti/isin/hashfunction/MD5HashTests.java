@@ -17,6 +17,17 @@ public class MD5HashTests implements HashFunctionContract<MD5Hash>
      * {@inheritDoc}
      */
     @Override
+    public String expectedName()
+    {
+
+        return "MD5";
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public MD5Hash sampleValue()
     {
 

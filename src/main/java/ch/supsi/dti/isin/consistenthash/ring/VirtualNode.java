@@ -1,14 +1,16 @@
 package ch.supsi.dti.isin.consistenthash.ring;
 
+
 /**
  * Represents a virtual node used by the Ring altorithm
  * to balance the distribution of nodes.
  *
  * @author Massimo Coluzzi
  */
-class VirtualNode
+public class VirtualNode
 {
 
+    
     /** Physical node whom this virtual node is a replica. */
     final String physicalNode;
 
@@ -22,7 +24,7 @@ class VirtualNode
      * @param physicalNode physical node whom this virtual node is a replica.
      * @param hash         the hash associated with the virtual node.
      */
-    VirtualNode( String physicalNode, long hash )
+    public VirtualNode( String physicalNode, long hash )
     {
 
         super();

@@ -56,7 +56,7 @@ public class JumpEngineTests
         
         final int size = random.nextInt( 100 ) + 1;
         final JumpEngine engine = new JumpEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION );
-        engine.increase();
+        engine.addBucket();
 
         assertEquals( size + 1, engine.size() );
 
@@ -69,7 +69,7 @@ public class JumpEngineTests
         
         final int size = random.nextInt( 100 ) + 1;
         final JumpEngine engine = new JumpEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION );
-        engine.decrease();
+        engine.removeBucket( size );
 
         assertEquals( size - 1, engine.size() );
 
