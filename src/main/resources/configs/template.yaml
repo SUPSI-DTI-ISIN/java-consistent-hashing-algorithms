@@ -58,16 +58,18 @@ common:
 # that implements the ConsistentHashFactory interface. Every entry in the list must provide
 # the algorithm name and an optional list of arguments to use during creation.
 algorithms:
-    - name: dx
-      args: 
+    - name: anchor
+      args:
           # The value is multiplied by the number of initial active nodes to find the capacity.
           # E.g., capacity=10 means that the overall capacity of the cluster is 10 times the initial number of working nodes.
           # Default value for the capacity is 10.
           capacity: 10
-    - name: anchor
-      args:
+    - name: dx
+      args: 
           # Same as above.
           capacity: 10
+    - name: jump
+          # No arguments
     - name: maglev
       args:
           # Number of entries per node in the lookup table.
@@ -76,18 +78,20 @@ algorithms:
           # The system expectes the numnber of permutations to be at least 128.
           # Default value is 128.
           permutations: 128
+    - name: memento
+          # No arguments
     - name: multi-probe
       args:
           # Number of times a key gets hashed during a lookup.
           # Default value is 21
           probes: 21
     - name: rendezvous
+          # No arguments
     - name: ring
       args:
           # Number of virtual nodes per physical node.
           # Default value is 1000
           virtualNodes: 1000
-    - name: jump
 
 
 # Lists the benchmarks to be executed.

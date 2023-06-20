@@ -10,6 +10,7 @@ The implemented algorithms are:
 * [2016] __maglev hash__ by [D. E. Eisenbud](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/44824.pdf)
 * [2020] __anchor hash__ by [Gal Mendelson et al.](https://arxiv.org/pdf/1812.09674.pdf)
 * [2021] __dx hash__ by [Chaos Dong and Fang Wang](https://arxiv.org/pdf/2107.07930.pdf)
+* [2023] __memento hash__ by [M. Coluzzi et al.](https://arxiv.org/pdf/2306.09783.pdf)
 
 
 Each implementation is divided into two classes:

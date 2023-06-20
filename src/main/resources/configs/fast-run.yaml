@@ -15,13 +15,14 @@ common:
         - xx
 
 algorithms:
-    - name: dx
     - name: anchor
+    - name: dx
+    - name: jump
     - name: maglev
+    - name: memento
     - name: multiProbe
     - name: rendezvous
     - name: ring
-    - name: jump
 
 benchmarks: 
     - name: init-time
