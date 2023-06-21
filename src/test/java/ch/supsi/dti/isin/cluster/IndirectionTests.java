@@ -277,7 +277,7 @@ public class IndirectionTests
         indirection.remove( size - 1 );
 
         assertEquals( size >> 1, indirection.size() );
-        assertEquals( size >> 1, indirection.capacity() );
+        assertEquals( size - 1, indirection.capacity() );
 
     }
 

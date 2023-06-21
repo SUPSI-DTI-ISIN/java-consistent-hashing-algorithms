@@ -146,7 +146,7 @@ public class Indirection
         bucketToNode.remove( bucket );
         
         if( bucket == capacity - 1 )
-            resizeCapacity();
+            --capacity;
 
         return bucket;
 
@@ -168,7 +168,7 @@ public class Indirection
         bucketToNode.remove( bucket );
 
         if( bucket == capacity - 1 )
-            resizeCapacity();
+            --capacity;
 
         return node;
         
@@ -195,28 +195,6 @@ public class Indirection
     {
 
         return capacity;
-
-    }
-
-
-    /* ***************** */
-    /*  PRIVATE METHODS  */
-    /* ***************** */
-
-
-    /**
-     * Reduces the value of the filed {@link #capacity}
-     * to fit the actual capacity.
-     * 
-     */
-    private void resizeCapacity()
-    {
-
-        do{
-
-            --capacity;
-
-        }while( capacity > 0 && ! bucketToNode.containsKey(capacity - 1) );
 
     }
 
