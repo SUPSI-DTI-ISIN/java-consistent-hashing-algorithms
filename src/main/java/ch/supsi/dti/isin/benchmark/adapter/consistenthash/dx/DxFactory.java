@@ -6,11 +6,13 @@ import java.util.function.Supplier;
 import org.nerd4j.utils.lang.Require;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
+import ch.supsi.dti.isin.benchmark.adapter.ResourceLoadingException;
 import ch.supsi.dti.isin.benchmark.config.AlgorithmConfig;
 import ch.supsi.dti.isin.benchmark.config.ConfigUtils;
 import ch.supsi.dti.isin.benchmark.config.InconsistentValueException;
 import ch.supsi.dti.isin.benchmark.config.ValuePath;
 import ch.supsi.dti.isin.cluster.Node;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.consistenthash.dx.DxEngine;
 import ch.supsi.dti.isin.consistenthash.dx.DxHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
@@ -83,15 +85,21 @@ public class DxFactory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public DxEnginePilot createEnginePilot( HashFunction hash, Collection<? extends Node> nodes )
+    public DxEnginePilot createEnginePilot( ConsistentHash consistentHash )
     {
 
-        final DxEngine engine = createEngineInitializer( hash, nodes ).get();
-        return new DxEnginePilot( engine );
+        final Object engine = Require.nonNull(
+            consistentHash, "The consistent hash to pilot is mandatory"
+        ).engine();
+
+        if( engine instanceof DxEngine )
+            return new DxEnginePilot( (DxEngine) engine );
+
+        throw ResourceLoadingException.incompatibleType( DxEngine.class, engine.getClass() );
 
     }
 
-
+    
     /* ***************** */
     /*  EXTENSION HOOKS  */
     /* ***************** */

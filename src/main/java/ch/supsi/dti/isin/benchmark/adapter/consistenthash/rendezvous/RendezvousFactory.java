@@ -7,8 +7,10 @@ import java.util.function.Supplier;
 import org.nerd4j.utils.lang.Require;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
+import ch.supsi.dti.isin.benchmark.adapter.ResourceLoadingException;
 import ch.supsi.dti.isin.benchmark.config.AlgorithmConfig;
 import ch.supsi.dti.isin.cluster.Node;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.consistenthash.rendezvous.RendezvousEngine;
 import ch.supsi.dti.isin.consistenthash.rendezvous.RendezvousHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
@@ -81,11 +83,17 @@ public class RendezvousFactory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public RendezvousEnginePilot createEnginePilot( HashFunction hash, Collection<? extends Node> nodes )
+    public RendezvousEnginePilot createEnginePilot( ConsistentHash consistentHash )
     {
 
-        final RendezvousEngine engine = createEngineInitializer( hash, nodes ).get();
-        return new RendezvousEnginePilot( engine );
+        final Object engine = Require.nonNull(
+            consistentHash, "The consistent hash to pilot is mandatory"
+        ).engine();
+        
+        if( engine instanceof RendezvousEngine )
+            return new RendezvousEnginePilot( (RendezvousEngine) engine );
+
+        throw ResourceLoadingException.incompatibleType( RendezvousEngine.class, engine.getClass() );
 
     }
 

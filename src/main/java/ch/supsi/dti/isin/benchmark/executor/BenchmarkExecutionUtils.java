@@ -115,6 +115,20 @@ public class BenchmarkExecutionUtils
     }
 
     /**
+     * Extracts from the given configuration the benchmark configuration for the given algorithm.
+     * 
+     * @param config the configuration to parse
+     * @param benchmark the benchmark for which to extract the configuration
+     * @return the configuration for the given benchmark
+     */
+    public static BenchmarkConfig getBenchmarkConfig( Config config, String benchmark )
+    {
+
+        return config.getBenchmarks().stream().filter( b -> b.getName().equals(benchmark) ).findFirst().get();
+
+    }
+
+    /**
      * Extracts from the given configuration the algorithm configuration for the given algorithm.
      * 
      * @param config the configuration to parse

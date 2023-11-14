@@ -53,6 +53,18 @@ common:
         - md5
         - xx
 
+    # Statistical distributions of the keys.
+    # At least one distribution must be provided.
+    # Benchmarks will run for every specified key distribution.
+    key-distributions:
+      # Keys are distributed evenly across the range of values
+      - uniform
+      # Keys are distributed following a Gaussian curve.
+      - normal
+      # Keys are distributed following a custom curve.
+      # Custom keys are loaded from a text file (one per row).
+      - custom
+
 # List of algorithms to be benchmarked. The list shows the currently implemented CH algorithms.
 # If you add an algorithm called MyAlgo, the tool will search for a class named "MyAlgoFactory"
 # that implements the ConsistentHashFactory interface. Every entry in the list must provide
@@ -111,17 +123,15 @@ benchmarks:
       common:
       # Used to define any benchmark specific argument.
       args:
-          # Statistical distributions of the keys.
-          # At least one distribution must be provided.
-          # Benchmarks will run for every specified key distribution.
-          distributions:
-            # Keys are distributed evenly across the range of values
-            - uniform
-            # Keys are distributed following a Gaussian curve.
-            - normal
-            # Keys are distributed following a custom curve.
-            # Custom keys are loaded from a text file (one per row).
-            - custom
+          # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+          # before performing the benchmark. This value defaults to 0
+          # (The value cannot be 1 because 100% of the nodes cannot be removed).
+          removal-rate: 0
+          # Defines the order of nodes removal. Valid values for this property are:
+          # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+          # Note that not all the algorithms support any removal order.
+          # For example Jump supports removals only in LIFO order.
+          removal-order: lifo
 
     # Benchmarks the time needed by the algorithm to update its internal data structure when the cluster get resized.
     - name: resize-time
@@ -145,7 +155,7 @@ benchmarks:
       args:
         # The benchmark will be executed over a number of keys that is calculated by: keyMultiplier * cluster-nodes.
         # Default value is 100.
-        keyMultiplier: 100
+        key-multiplier: 100
 
     # Benchmarks the distribution of the keys among the nodes of the cluster after a resize.
     - name: resize-balance
@@ -155,7 +165,7 @@ benchmarks:
       args:
           # See keyMultiplier on BenchmarkBalance.
           # Default value is 100.
-          keyMultiplier: 100 
+          key-multiplier: 100 
 
     # Benchmarks the ability of the algorithm to move the minimal number of keys after a resize.
     - name: monotonicity

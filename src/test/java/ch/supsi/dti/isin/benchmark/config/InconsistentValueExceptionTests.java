@@ -4,6 +4,8 @@ package ch.supsi.dti.isin.benchmark.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -65,8 +67,21 @@ public class InconsistentValueExceptionTests
     public void factory_method_notAPercentage_should_return_proper_messages( float value )
     {
 
-        final String expectedMessage = "Expected property my-property to be in range [0,100) but was " + value;
+        final String expectedMessage = "Expected property my-property to be in range [0,1) but was " + value;
         final InconsistentValueException lessThanZero = InconsistentValueException.notAPercentage( PATH, value );
+        
+        assertNotNull( lessThanZero );
+        assertEquals( expectedMessage, lessThanZero.getMessage() );
+        
+    }
+
+    @Test
+    public void factory_method_notIn_should_return_proper_messages()
+    {
+
+        final List<Object> values = Arrays.asList( "first", "second" );
+        final String expectedMessage = "Expected property my-property to be one of [first, second] but was third";
+        final InconsistentValueException lessThanZero = InconsistentValueException.notIn( PATH, values, "third" );
         
         assertNotNull( lessThanZero );
         assertEquals( expectedMessage, lessThanZero.getMessage() );

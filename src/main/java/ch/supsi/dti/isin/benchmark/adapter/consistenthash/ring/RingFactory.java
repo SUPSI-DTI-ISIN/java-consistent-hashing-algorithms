@@ -8,11 +8,13 @@ import java.util.function.Supplier;
 import org.nerd4j.utils.lang.Require;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
+import ch.supsi.dti.isin.benchmark.adapter.ResourceLoadingException;
 import ch.supsi.dti.isin.benchmark.config.AlgorithmConfig;
 import ch.supsi.dti.isin.benchmark.config.ConfigUtils;
 import ch.supsi.dti.isin.benchmark.config.InconsistentValueException;
 import ch.supsi.dti.isin.benchmark.config.ValuePath;
 import ch.supsi.dti.isin.cluster.Node;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.consistenthash.ring.RingEngine;
 import ch.supsi.dti.isin.consistenthash.ring.RingHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
@@ -92,11 +94,17 @@ public class RingFactory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public RingEnginePilot createEnginePilot( HashFunction hash, Collection<? extends Node> nodes )
+    public RingEnginePilot createEnginePilot( ConsistentHash consistentHash )
     {
 
-        final RingEngine engine = createEngineInitializer( hash, nodes ).get();
-        return new RingEnginePilot( engine );
+        final Object engine = Require.nonNull(
+            consistentHash, "The consistent hash to pilot is mandatory"
+        ).engine();
+        
+        if( engine instanceof RingEngine )
+            return new RingEnginePilot( (RingEngine) engine );
+
+        throw ResourceLoadingException.incompatibleType( RingEngine.class, engine.getClass() );
 
     }
 

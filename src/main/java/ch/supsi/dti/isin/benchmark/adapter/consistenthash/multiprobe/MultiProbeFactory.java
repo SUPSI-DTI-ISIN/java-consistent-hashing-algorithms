@@ -7,11 +7,13 @@ import java.util.function.Supplier;
 import org.nerd4j.utils.lang.Require;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
+import ch.supsi.dti.isin.benchmark.adapter.ResourceLoadingException;
 import ch.supsi.dti.isin.benchmark.config.AlgorithmConfig;
 import ch.supsi.dti.isin.benchmark.config.ConfigUtils;
 import ch.supsi.dti.isin.benchmark.config.InconsistentValueException;
 import ch.supsi.dti.isin.benchmark.config.ValuePath;
 import ch.supsi.dti.isin.cluster.Node;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.consistenthash.multiprobe.MultiProbeEngine;
 import ch.supsi.dti.isin.consistenthash.multiprobe.MultiProbeHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
@@ -86,11 +88,17 @@ public class MultiProbeFactory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public MultiProbeEnginePilot createEnginePilot( HashFunction hash, Collection<? extends Node> nodes )
+    public MultiProbeEnginePilot createEnginePilot( ConsistentHash consistentHash )
     {
 
-        final MultiProbeEngine engine = createEngineInitializer( hash, nodes ).get();
-        return new MultiProbeEnginePilot( engine );
+        final Object engine = Require.nonNull(
+            consistentHash, "The consistent hash to pilot is mandatory"
+        ).engine();
+        
+        if( engine instanceof MultiProbeEngine )
+            return new MultiProbeEnginePilot( (MultiProbeEngine) engine );
+
+        throw ResourceLoadingException.incompatibleType( MultiProbeEngine.class, engine.getClass() );
 
     }
 

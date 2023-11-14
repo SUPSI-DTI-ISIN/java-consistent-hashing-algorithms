@@ -1,5 +1,6 @@
 package ch.supsi.dti.isin.benchmark.config;
 
+import java.util.List;
 
 /**
  * Exception thrown when the given value is not in the expected range.
@@ -88,7 +89,32 @@ public class InconsistentValueException extends InvalidConfigException
             new StringBuilder()
                 .append( "Expected property " )
                 .append( path )
-                .append( " to be in range [0,100) but was " )
+                .append( " to be in range [0,1) but was " )
+                .append( value )
+                .toString()
+        );
+
+    }
+
+    /**
+     * Creates a new {@link InconsistentValueException} for the case
+     * when the value is expected to be within a list of constants.
+     * 
+     * @param path   the path of the property
+     * @param values the possible values
+     * @param value  the inconsistent value
+     * @return a new exception
+     */
+    public static InconsistentValueException notIn( ValuePath path, List<Object> values, Object value )
+    {
+
+        return new InconsistentValueException(
+            new StringBuilder()
+                .append( "Expected property " )
+                .append( path )
+                .append( " to be one of " )
+                .append( values )
+                .append( " but was " )
                 .append( value )
                 .toString()
         );

@@ -76,7 +76,7 @@ public class InitTime extends BenchmarkExecutor
         final IterationsConfig iterations = common.getIterations();
 
         final Options opt = new OptionsBuilder()
-            .include( InitTime.Executor.class.getSimpleName() )
+            .include( InitTime.InitTimeExecutor.class.getSimpleName() )
 
             .param( "function", functions )
             .param( "initNodes", initNodes )
@@ -125,7 +125,7 @@ public class InitTime extends BenchmarkExecutor
      * @author Massimo Coluzzi
      */
     @State(Scope.Benchmark)
-    public static class Executor
+    public static class InitTimeExecutor
     {
 
         /** Number of nodes used to initialize the cluster. */

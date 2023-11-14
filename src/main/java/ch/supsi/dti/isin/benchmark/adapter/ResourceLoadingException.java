@@ -75,4 +75,26 @@ public class ResourceLoadingException extends RuntimeException
 
     }
 
+    /**
+     * Returns a new {@link ResourceLoadingException} in the case of an incompatible type.
+     * 
+     * @param expected the expected type
+     * @param actual   the provided type
+     * @return a new {@link ResourceLoadingException}
+     */
+    public static ResourceLoadingException incompatibleType( Class<?> expected, Class<?> actual )
+    {
+
+        final String message = new StringBuilder()
+            .append( "Incompatible type. Expected " )
+            .append( expected )
+            .append( ", but " )
+            .append( actual )
+            .append( " has been provided" )
+            .toString();
+
+        return new ResourceLoadingException( message );
+
+    }
+
 }

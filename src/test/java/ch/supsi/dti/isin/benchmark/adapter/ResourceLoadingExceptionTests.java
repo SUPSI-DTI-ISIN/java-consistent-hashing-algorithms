@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import ch.supsi.dti.isin.benchmark.config.InconsistentValueException;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 
 
@@ -56,5 +57,19 @@ public class ResourceLoadingExceptionTests
         
     }
 
+    @Test
+    public void factory_method_incompatibleType_should_return_proper_messages()
+    {
+
+        final Class<?> expected = HashFunction.class;
+        final Class<?> actual   = ConsistentHash.class;
+
+        final String expectedMessage = "Incompatible type. Expected " + expected + ", but " + actual + " has been provided";
+        final ResourceLoadingException notInstantiable = ResourceLoadingException.incompatibleType( expected, actual );
+        System.out.println( expectedMessage );
+        assertNotNull( notInstantiable );
+        assertEquals( expectedMessage, notInstantiable.getMessage() );
+        
+    }
 
 }

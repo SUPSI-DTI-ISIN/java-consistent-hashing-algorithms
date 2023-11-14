@@ -83,7 +83,7 @@ public abstract class ConsistentHashFactory
      * @param config additional configurations for the algorithm
      * @return a new object implementing the {@link ConsistentHashEnginePilot} interface
      */
-     public abstract ConsistentHashEnginePilot<?> createEnginePilot( HashFunction hash, Collection<? extends Node> nodes );
+     public abstract ConsistentHashEnginePilot<?> createEnginePilot( ConsistentHash consistentHash );
 
 
     /* **************** */

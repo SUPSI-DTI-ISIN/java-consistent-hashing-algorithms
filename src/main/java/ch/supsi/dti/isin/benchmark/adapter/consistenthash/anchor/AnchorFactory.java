@@ -7,11 +7,13 @@ import java.util.function.Supplier;
 import org.nerd4j.utils.lang.Require;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
+import ch.supsi.dti.isin.benchmark.adapter.ResourceLoadingException;
 import ch.supsi.dti.isin.benchmark.config.AlgorithmConfig;
 import ch.supsi.dti.isin.benchmark.config.ConfigUtils;
 import ch.supsi.dti.isin.benchmark.config.InconsistentValueException;
 import ch.supsi.dti.isin.benchmark.config.ValuePath;
 import ch.supsi.dti.isin.cluster.Node;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.consistenthash.anchor.AnchorEngine;
 import ch.supsi.dti.isin.consistenthash.anchor.AnchorHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
@@ -83,11 +85,17 @@ public class AnchorFactory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public AnchorEnginePilot createEnginePilot( HashFunction hash, Collection<? extends Node> nodes )
+    public AnchorEnginePilot createEnginePilot( ConsistentHash consistentHash )
     {
 
-        final AnchorEngine engine = createEngineInitializer( hash, nodes ).get();
-        return new AnchorEnginePilot( engine );
+        final Object engine = Require.nonNull(
+            consistentHash, "The consistent hash to pilot is mandatory"
+        ).engine();
+        
+        if( engine instanceof AnchorEngine )
+            return new AnchorEnginePilot( (AnchorEngine) engine );
+
+        throw ResourceLoadingException.incompatibleType( AnchorEngine.class, engine.getClass() );
 
     }
 

@@ -156,28 +156,32 @@ public interface ConsistentHashFactoryContract<F extends ConsistentHashFactory> 
         final F factory = sampleValue( CONFIG );
         assertThrows(
             RequirementFailure.class,
-            () -> factory.createEnginePilot( null, NODES )
-        );
-        assertThrows(
-            RequirementFailure.class,
-            () -> factory.createEnginePilot( FUNCTION, null )
-        );
-        assertThrows(
-            RequirementFailure.class,
-            () -> factory.createEnginePilot( FUNCTION, Collections.emptyList() )
+            () -> factory.createEnginePilot( null )
         );
 
     }
 
     @Test
-    default void method_createEnginePilot_should_create_a_valid_supplier()
+    default void method_createEnginePilot_should_create_a_valid_pilot()
     {
 
         final F factory = sampleValue( CONFIG );
         
-        final ConsistentHashEnginePilot<?> pilot = factory.createEnginePilot( FUNCTION, NODES );
+        final ConsistentHash consistentHash = factory.createConsistentHash( FUNCTION, NODES );
+        final ConsistentHashEnginePilot<?> pilot = factory.createEnginePilot( consistentHash );
         assertNotNull( pilot );
 
+    }
+
+    @Test
+    default void method_createEnginePilot_must_verify_the_engine_to_be_of_the_expected_type()
+    {
+
+        final F factory = sampleValue( CONFIG );
+        
+        final ConsistentHash consistentHash = new FakeConsistentHash();
+        assertThrows( ResourceLoadingException.class, () -> factory.createEnginePilot(consistentHash) );
+        
     }
 
 
@@ -196,5 +200,46 @@ public interface ConsistentHashFactoryContract<F extends ConsistentHashFactory> 
         return map;
 
     }
+
+
+    public static class FakeConsistentHash implements ConsistentHash
+    {
+
+        @Override
+        public Node getNode( String key )
+        {
+            throw new UnsupportedOperationException("Unimplemented method 'getNode'");
+        }
+
+        @Override
+        public void addNodes( Collection<? extends Node> nodes )
+        {
+            throw new UnsupportedOperationException("Unimplemented method 'addNodes'");
+        }
+
+        @Override
+        public void removeNodes( Collection<? extends Node> nodes )
+        {
+            throw new UnsupportedOperationException("Unimplemented method 'removeNodes'");
+        }
+
+        @Override
+        public boolean supportsRandomRemovals()
+        {
+            throw new UnsupportedOperationException("Unimplemented method 'supportsRandomRemovals'");
+        }
+
+        @Override
+        public int nodeCount()
+        {
+            throw new UnsupportedOperationException("Unimplemented method 'nodeCount'");
+        }
+
+        @Override
+        public Object engine()
+        {
+            return new Object();
+        }}
+    
 
   }

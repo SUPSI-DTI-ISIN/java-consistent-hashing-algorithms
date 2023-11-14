@@ -7,8 +7,10 @@ import java.util.function.Supplier;
 import org.nerd4j.utils.lang.Require;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
+import ch.supsi.dti.isin.benchmark.adapter.ResourceLoadingException;
 import ch.supsi.dti.isin.benchmark.config.AlgorithmConfig;
 import ch.supsi.dti.isin.cluster.Node;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.consistenthash.memento.MementoEngine;
 import ch.supsi.dti.isin.consistenthash.memento.MementoHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
@@ -73,15 +75,21 @@ public class MementoFactory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public MementoEnginePilot createEnginePilot( HashFunction hash, Collection<? extends Node> nodes )
+    public MementoEnginePilot createEnginePilot( ConsistentHash consistentHash )
     {
 
-        final MementoEngine engine = createEngineInitializer( hash, nodes ).get();
-        return new MementoEnginePilot( engine );
+        final Object engine = Require.nonNull(
+            consistentHash, "The consistent hash to pilot is mandatory"
+        ).engine();
+        
+        if( engine instanceof MementoEngine )
+            return new MementoEnginePilot( (MementoEngine) engine );
+
+        throw ResourceLoadingException.incompatibleType( MementoEngine.class, engine.getClass() );
 
     }
 
-
+    
     /* ***************** */
     /*  EXTENSION HOOKS  */
     /* ***************** */

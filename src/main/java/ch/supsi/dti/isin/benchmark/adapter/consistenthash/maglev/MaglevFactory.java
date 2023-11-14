@@ -11,11 +11,13 @@ import org.nerd4j.utils.lang.Require;
 import org.nerd4j.utils.math.PrimeSieve;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
+import ch.supsi.dti.isin.benchmark.adapter.ResourceLoadingException;
 import ch.supsi.dti.isin.benchmark.config.AlgorithmConfig;
 import ch.supsi.dti.isin.benchmark.config.ConfigUtils;
 import ch.supsi.dti.isin.benchmark.config.InconsistentValueException;
 import ch.supsi.dti.isin.benchmark.config.ValuePath;
 import ch.supsi.dti.isin.cluster.Node;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.consistenthash.maglev.MaglevEngine;
 import ch.supsi.dti.isin.consistenthash.maglev.MaglevHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
@@ -95,14 +97,19 @@ public class MaglevFactory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public MaglevEnginePilot createEnginePilot( HashFunction hash, Collection<? extends Node> nodes )
+    public MaglevEnginePilot createEnginePilot( ConsistentHash consistentHash )
     {
 
-        final MaglevEngine engine = createEngineInitializer( hash, nodes ).get();
-        return new MaglevEnginePilot( engine );
+        final Object engine = Require.nonNull(
+            consistentHash, "The consistent hash to pilot is mandatory"
+        ).engine();
+        
+        if( engine instanceof MaglevEngine )
+            return new MaglevEnginePilot( (MaglevEngine) engine );
+
+        throw ResourceLoadingException.incompatibleType( MaglevEngine.class, engine.getClass() );
 
     }
-
 
         
     /* ******************* */

@@ -27,6 +27,7 @@ import ch.supsi.dti.isin.benchmark.config.JMHConfigWrapper;
 import ch.supsi.dti.isin.benchmark.config.TimeConfig;
 import ch.supsi.dti.isin.cluster.Node;
 import ch.supsi.dti.isin.cluster.SimpleNode;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 
 
@@ -77,7 +78,7 @@ public class ResizeTime extends BenchmarkExecutor
         final TimeConfig time = common.getTime();
 
         final Options opt = new OptionsBuilder()
-            .include( ResizeTime.class.getSimpleName() )
+            .include( ResizeTime.ResizeTimeExecutor.class.getSimpleName() )
 
             .param( "function", functions )
             .param( "initNodes", initNodes )
@@ -129,7 +130,7 @@ public class ResizeTime extends BenchmarkExecutor
      * @author Massimo Coluzzi
      */
     @State(Scope.Benchmark)
-    public static class Executor<N>
+    public static class ResizeTimeExecutor<N>
     {
 
         /** Number of nodes used to initialize the cluster. */
@@ -169,7 +170,8 @@ public class ResizeTime extends BenchmarkExecutor
             final HashFunction hashFunction = HashFunctionLoader.getInstance().load( function );
             final List<Node> nodes = SimpleNode.create( initNodes );
 
-            final ConsistentHashEnginePilot<?> pilot = factory.createEnginePilot( hashFunction, nodes );
+            final ConsistentHash consistentHash = factory.createConsistentHash( hashFunction, nodes );
+            final ConsistentHashEnginePilot<?> pilot = factory.createEnginePilot( consistentHash );
             this.pilot = (ConsistentHashEnginePilot<N>) pilot;
 
         }

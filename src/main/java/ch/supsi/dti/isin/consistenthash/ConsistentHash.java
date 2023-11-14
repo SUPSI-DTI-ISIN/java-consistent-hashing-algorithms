@@ -20,6 +20,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
 /**
  * Represents a Consistent hashing altoritm.
  * 
+ * 
  * @author Massimo Coluzzi
  */
 public interface ConsistentHash

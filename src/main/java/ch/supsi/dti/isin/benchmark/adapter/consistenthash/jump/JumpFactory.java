@@ -7,8 +7,10 @@ import java.util.function.Supplier;
 import org.nerd4j.utils.lang.Require;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
+import ch.supsi.dti.isin.benchmark.adapter.ResourceLoadingException;
 import ch.supsi.dti.isin.benchmark.config.AlgorithmConfig;
 import ch.supsi.dti.isin.cluster.Node;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.consistenthash.jump.JumpEngine;
 import ch.supsi.dti.isin.consistenthash.jump.JumpHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
@@ -75,11 +77,17 @@ public class JumpFactory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public JumpEnginePilot createEnginePilot( HashFunction hash, Collection<? extends Node> nodes )
+    public JumpEnginePilot createEnginePilot( ConsistentHash consistentHash )
     {
 
-        final JumpEngine engine = createEngineInitializer( hash, nodes ).get();
-        return new JumpEnginePilot( engine );
+        final Object engine = Require.nonNull(
+            consistentHash, "The consistent hash to pilot is mandatory"
+        ).engine();
+        
+        if( engine instanceof JumpEngine )
+            return new JumpEnginePilot( (JumpEngine) engine );
+
+        throw ResourceLoadingException.incompatibleType( JumpEngine.class, engine.getClass() );
 
     }
 

@@ -1,9 +1,13 @@
 package ch.supsi.dti.isin.benchmark.executor;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.nerd4j.utils.lang.IsNot;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Param;
@@ -22,11 +26,15 @@ import ch.supsi.dti.isin.benchmark.adapter.HashFunctionLoader;
 import ch.supsi.dti.isin.benchmark.config.AlgorithmConfig;
 import ch.supsi.dti.isin.benchmark.config.BenchmarkConfig;
 import ch.supsi.dti.isin.benchmark.config.CommonConfig;
+import ch.supsi.dti.isin.benchmark.config.InconsistentValueException;
+import ch.supsi.dti.isin.benchmark.config.InvalidTypeException;
 import ch.supsi.dti.isin.benchmark.config.IterationsConfig;
 import ch.supsi.dti.isin.benchmark.config.JMHConfigWrapper;
 import ch.supsi.dti.isin.benchmark.config.TimeConfig;
+import ch.supsi.dti.isin.benchmark.config.ValuePath;
 import ch.supsi.dti.isin.cluster.Node;
 import ch.supsi.dti.isin.cluster.SimpleNode;
+import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 import ch.supsi.dti.isin.key.Distribution;
 import ch.supsi.dti.isin.key.KeyGenerator;
@@ -69,18 +77,20 @@ public class LookupTime extends BenchmarkExecutor
     
         final Path file = BenchmarkExecutionUtils.getOutputFile( config );
         
+        final String[] benchmarks    = { config.getName() };
         final String[] distributions = BenchmarkExecutionUtils.getKeyDistributions( config );
-        final String[] functions  = BenchmarkExecutionUtils.getHashFunctionNames( config );
-        final String[] initNodes  = BenchmarkExecutionUtils.getInitNodes( config );
-        final String[] algorithms = BenchmarkExecutionUtils.getAlgorithms( factories );
+        final String[] functions     = BenchmarkExecutionUtils.getHashFunctionNames( config );
+        final String[] initNodes     = BenchmarkExecutionUtils.getInitNodes( config );
+        final String[] algorithms    = BenchmarkExecutionUtils.getAlgorithms( factories );
 
         final CommonConfig common = config.getCommon();
         final TimeConfig time = common.getTime();
         final IterationsConfig iterations = common.getIterations();
                 
         final Options opt = new OptionsBuilder()
-            .include( LookupTime.Executor.class.getSimpleName() )
+            .include( LookupTime.LookupTimeExecutor.class.getSimpleName() )
 
+            .param( "benchmark", benchmarks )
             .param( "function", functions )
             .param( "initNodes", initNodes )
             .param( "algorithm", algorithms )
@@ -90,7 +100,7 @@ public class LookupTime extends BenchmarkExecutor
             .result( file.toString() )
 
             .shouldDoGC( common.isGc() )
-            .forks( 1 )
+            .forks( 0 )
 
             .mode( Mode.AverageTime )
             .timeUnit( time.getUnit() )
@@ -129,10 +139,14 @@ public class LookupTime extends BenchmarkExecutor
      * @author Massimo Coluzzi
      */
     @State(Scope.Benchmark)
-    public static class Executor
+    public static class LookupTimeExecutor
     {
 
-       /** Number of nodes used to initialize the cluster. */
+        /** Name of the current benchmark. */
+        @Param({})
+        private String benchmark;
+
+        /** Number of nodes used to initialize the cluster. */
         @Param({})
         private int initNodes;
 
@@ -174,14 +188,20 @@ public class LookupTime extends BenchmarkExecutor
         public void setup( JMHConfigWrapper wrapper )
         {
             
+            final BenchmarkConfig benchmarkConfig = BenchmarkExecutionUtils.getBenchmarkConfig( wrapper.getConfig(), benchmark );
             final AlgorithmConfig algorithmConfig = BenchmarkExecutionUtils.getAlgorithmConfig( wrapper.getConfig(), algorithm );
             final ConsistentHashFactory factory = BenchmarkExecutionUtils.getFactory( algorithmConfig );
 
             final HashFunction hashFunction = HashFunctionLoader.getInstance().load( function );
             final List<Node> nodes = SimpleNode.create( initNodes );
 
+            final ConsistentHash consistentHash = factory.createConsistentHash( hashFunction, nodes );
+            removeNodesIfNeeded( benchmarkConfig, consistentHash, nodes );
+
             this.keys = KeyGenerator.create(distribution).iterator();
-            this.pilot = factory.createEnginePilot( hashFunction, nodes );
+            this.pilot = factory.createEnginePilot( consistentHash );
+
+            
         }
 
 
@@ -202,6 +222,165 @@ public class LookupTime extends BenchmarkExecutor
             return pilot.getNode( keys.next() );
 
         }
+
+
+        /* ***************** */
+        /*  PRIVATE METHODS  */
+        /* ***************** */
+
+
+        /**
+         * Removes the configured percentage of nodes from the consistent hash engine.
+         * If the removal rate is set to 0, nothing will be removed.
+         * 
+         * @param benchmarkConfig the configuration to parse
+         * @param consistentHash  the algorithm to update
+         * @param nodes           all the available nodes
+         */
+        private void removeNodesIfNeeded(
+            BenchmarkConfig benchmarkConfig, ConsistentHash consistentHash, List<Node> nodes
+        )
+        {
+
+            final List<Node> toRemove = getNodesToRemove( benchmarkConfig, nodes );
+            if( IsNot.empty(toRemove) )
+                consistentHash.removeNodes( toRemove );
+
+        }
+
+        /**
+         * Returns the list of nodes to remove if any.
+         * Otherwise, returns {@code null}.
+         * 
+         * @param benchmarkConfig configuration to parse
+         * @param nodes list of nodes
+         * @return nodes to remove or {@code null}
+         */
+        private List<Node> getNodesToRemove( BenchmarkConfig benchmarkConfig, List<Node> nodes )
+        {
+
+            final float removalRate = getRemovalRate( benchmarkConfig );
+            if( removalRate <= 0 )
+                return null;
+
+            final List<Node> toRemove = new ArrayList<>( nodes );
+            final int nodesToRemove = (int)(initNodes * removalRate);
+            final RemovalOrder removalOrder = getRemovalOrder( benchmarkConfig );
+
+            switch( removalOrder )
+            {
+
+                case FIFO:
+                    break;
+                
+                case LIFO:
+                    Collections.reverse( toRemove );
+                    break;
+
+                case RANDOM:
+                    Collections.shuffle( toRemove );
+                    break;
+
+            }
+
+            return toRemove.subList( 0, nodesToRemove );
+
+        }
+
+        /**
+         * Returns the rate of nodes to remove. 
+         * 
+         * @param benchmarkConfig the configuration to parse
+         * @return the rate of nodes to remove
+         */
+        private float getRemovalRate( BenchmarkConfig benchmarkConfig )
+        {
+
+            final String property = "removalrate";
+            final Object value = benchmarkConfig.getArgs().get( property );
+            if( value == null )
+                return 0;
+
+            if( ! (value instanceof Number) )
+                InvalidTypeException.of( valuePathOf(property), value, Float.class );
+
+            final float removalRate = ((Number) value).floatValue();
+            if( removalRate < 0 && removalRate >= 1 )
+                InconsistentValueException.notAPercentage( valuePathOf(property), removalRate );
+
+            return removalRate;
+
+        }
+
+        /**
+         * Returns the order to apply to the nodes removal.
+         * 
+         * @param benchmarkConfig the configuration to parse
+         * @return the order of node removal
+         */
+        private RemovalOrder getRemovalOrder( BenchmarkConfig benchmarkConfig )
+        {
+
+            final String property = "removalorder";
+            final Object value = benchmarkConfig.getArgs().get( property );
+            if( value == null )
+                return RemovalOrder.LIFO;
+
+            if( ! (value instanceof String) )
+                InvalidTypeException.of( valuePathOf(property), value, String.class );
+
+            try{
+
+                return RemovalOrder.valueOf( value.toString().toUpperCase() );
+
+            }catch( Exception ex )
+            {
+
+                final List<Object> possibleValues = Arrays.asList( (Object[]) RemovalOrder.values() );
+                throw InconsistentValueException.notIn( valuePathOf(property), possibleValues, value );
+
+            }
+
+        }
+
+
+        /**
+         * Returns the path of the given property in the context of this benchmark.
+         * 
+         * @param property the property to point
+         * @return the path to the property in the configuration file
+         */
+        private ValuePath valuePathOf( String property )
+        {
+
+             return ValuePath.root()
+                .append( "benchmarks" )
+                .append( "lookup-time" )
+                .append( "args" )
+                .append( property );
+
+        }
+
+
+        /**
+         * Enumerates the possible removal orders.
+         * 
+         * @author Massimo Coluzzi
+         */
+        private enum RemovalOrder
+        {
+
+            /** Nodes are removed in First-In-First-Out order. */
+            FIFO,
+            
+            /** Nodes are removed in Last-In-First-Out order. */
+            LIFO,
+            
+            /** Nodes are removed in random order. */
+            RANDOM
+
+        }
+
     }
 
 }
