@@ -16,3 +16,6 @@ target/
 
 # Ingnore Mac related folders
 .DS_Store
+
+# Ignore dev container settings
+.devcontainer
