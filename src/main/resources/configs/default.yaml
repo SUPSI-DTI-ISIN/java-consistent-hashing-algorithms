@@ -21,6 +21,7 @@ algorithms:
     - name: maglev
     - name: memento
     - name: multi-probe
+    - name: power
     - name: rendezvous
     - name: ring
 

@@ -20,7 +20,8 @@ algorithms:
     - name: jump
     - name: maglev
     - name: memento
-    - name: multiProbe
+    - name: multi-probe
+    - name: power
     - name: rendezvous
     - name: ring
 

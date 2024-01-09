@@ -97,6 +97,8 @@ algorithms:
           # Number of times a key gets hashed during a lookup.
           # Default value is 21
           probes: 21
+    - name: power
+          # No arguments
     - name: rendezvous
           # No arguments
     - name: ring
