@@ -58,7 +58,7 @@ public class InconsistentValueException extends InvalidConfigException
      * @param value the inconsistent value
      * @return a new exception
      */
-    public static InconsistentValueException lessOrEqual( ValuePath path, int limit, Number value )
+    public static InconsistentValueException lessOrEqual( ValuePath path, Number limit, Number value )
     {
 
         return new InconsistentValueException(

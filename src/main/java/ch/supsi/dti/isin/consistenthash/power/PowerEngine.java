@@ -76,7 +76,7 @@ public class PowerEngine implements BucketBasedEngine
     {
 
         final long hash = hashFunction.hash( key );
-        final Random random = new Random();
+        final Random random = new Random( hash );
 
         final int r1 = f( hash, this.m1, random );
         if( r1 < size )
@@ -198,7 +198,7 @@ public class PowerEngine implements BucketBasedEngine
             return 0;
 
         final int h = Integer.highestOneBit( kBits );
-        random.setSeed( hash );
+        random.setSeed( hash ^ h );
 
         return h + random.nextInt( h );
         
@@ -216,7 +216,7 @@ public class PowerEngine implements BucketBasedEngine
 
          /* Initially, x is set to the value of m/2-1 */
         int x = this.m2;
-        random.setSeed(hash ^ size ^ x );
+        // random.setSeed( hash );
 
         while( true )
         {
