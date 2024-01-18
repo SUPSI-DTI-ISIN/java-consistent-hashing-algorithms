@@ -1,4 +1,4 @@
-package ch.supsi.dti.isin.consistenthash.recall_v1;
+package ch.supsi.dti.isin.consistenthash.recall;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,11 +12,11 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
-import ch.supsi.dti.isin.consistenthash.recall_v1.HashTableV1.Pointer;
-import ch.supsi.dti.isin.consistenthash.recall_v1.HashTableV1.Replacement;
+import ch.supsi.dti.isin.consistenthash.recall.HashTable.Pointer;
+import ch.supsi.dti.isin.consistenthash.recall.HashTable.Replacement;
 
 /**
- * Test suite for the class {@link HashTableV1}.
+ * Test suite for the class {@link HashTable}.
  * 
  * @author Massimo Coluzzi
  */
@@ -27,10 +27,10 @@ public class HashTableTests
     private static final Random random = new Random();
 
     @Test
-    public void a_new_created_HashTableV1_must_be_empty()
+    public void a_new_created_HashTable_must_be_empty()
     {
 
-        final HashTableV1<?> hashTable = new HashTableV1<>();
+        final HashTable<?> hashTable = new HashTable<>();
 
         assertTrue( hashTable.isEmpty() );
         assertEquals( 0, hashTable.size() );
@@ -42,7 +42,7 @@ public class HashTableTests
     public void when_an_entry_is_added_should_be_found()
     {
 
-        final HashTableV1<EmptyEntry> hashTable = new HashTableV1<>();
+        final HashTable<EmptyEntry> hashTable = new HashTable<>();
         assertEquals( 0, hashTable.size() );
 
         final EmptyEntry entry = new EmptyEntry( random.nextInt(100) );
@@ -59,7 +59,7 @@ public class HashTableTests
     public void when_an_entry_is_removed_it_must_disappear()
     {
 
-        final HashTableV1<EmptyEntry> hashTable = new HashTableV1<>();
+        final HashTable<EmptyEntry> hashTable = new HashTable<>();
         final EmptyEntry entry1 = new EmptyEntry( random.nextInt(100) );
         final EmptyEntry entry2 = new EmptyEntry( random.nextInt(100) );
 
@@ -92,7 +92,7 @@ public class HashTableTests
     public void if_we_remove_the_same_bucket_twice_nothing_happens()
     {
 
-        final HashTableV1<EmptyEntry> hashTable = new HashTableV1<>();
+        final HashTable<EmptyEntry> hashTable = new HashTable<>();
         final EmptyEntry entry1 = new EmptyEntry( random.nextInt(100) );
         final EmptyEntry entry2 = new EmptyEntry( random.nextInt(100) );
 
@@ -117,7 +117,7 @@ public class HashTableTests
     public void more_than_one_entry_for_the_same_bucket_can_be_added()
     {
 
-        final HashTableV1<EmptyEntry> hashTable = new HashTableV1<>();
+        final HashTable<EmptyEntry> hashTable = new HashTable<>();
 
         final int bucket = random.nextInt( 100 );
         final EmptyEntry entry1 = new EmptyEntry( bucket );
@@ -147,7 +147,7 @@ public class HashTableTests
     public void when_capacity_is_reached_should_increase()
     {
 
-        final HashTableV1<EmptyEntry> hashTable = new HashTableV1<>();
+        final HashTable<EmptyEntry> hashTable = new HashTable<>();
         assertEquals( 12, hashTable.capacity() );
         assertEquals( 0, hashTable.size() );
 
@@ -168,7 +168,7 @@ public class HashTableTests
     public void when_size_reduces_capacity_should_decrease_accordingly()
     {
 
-        final HashTableV1<EmptyEntry> hashTable = new HashTableV1<>();
+        final HashTable<EmptyEntry> hashTable = new HashTable<>();
         assertEquals( 12, hashTable.capacity() );
         assertEquals( 0, hashTable.size() );
 
@@ -196,7 +196,7 @@ public class HashTableTests
     {
 
         final int size = random.nextInt( 100 ) + 13;
-        final HashTableV1<EmptyEntry> hashTable = new HashTableV1<>();
+        final HashTable<EmptyEntry> hashTable = new HashTable<>();
         
         for( int i = 1; i <= size; ++i )
             hashTable.add( new EmptyEntry(i) );
@@ -247,7 +247,7 @@ public class HashTableTests
     /* **************** */
 
 
-    private static class EmptyEntry extends HashTableV1.Entry
+    private static class EmptyEntry extends HashTable.Entry
     {
 
         public EmptyEntry( int bucket )

@@ -1,4 +1,4 @@
-package ch.supsi.dti.isin.consistenthash.recall_v1;
+package ch.supsi.dti.isin.consistenthash.recall;
 
 import org.nerd4j.utils.lang.ToString;
 
@@ -9,7 +9,7 @@ import org.nerd4j.utils.lang.ToString;
  * 
  * @author Massimo Coluzzi
  */
-class HashTableV1<E extends HashTableV1.Entry>
+class HashTable<E extends HashTable.Entry>
 {
 
     /** The minimum size of the memento table. */
@@ -30,7 +30,7 @@ class HashTableV1<E extends HashTableV1.Entry>
      * Constructor with parameters.
      * 
      */
-    HashTableV1()
+    HashTable()
     {
 
         super();

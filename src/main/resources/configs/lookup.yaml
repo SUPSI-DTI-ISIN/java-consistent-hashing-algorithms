@@ -68,7 +68,7 @@ algorithms:
     #       # E.g., capacity=10 means that the overall capacity of the cluster is 10 times the initial number of working nodes.
     #       # Default value for the capacity is 10.
     #       capacity: 10
-    # - name: dx
+    - name: dx
     #   args: 
     #       # Same as above.
     #       capacity: 10
@@ -78,7 +78,7 @@ algorithms:
     #       # No arguments
     # - name: power
           # No arguments
-    - name: recallv1
+    - name: recall
     #       # No arguments
     
 

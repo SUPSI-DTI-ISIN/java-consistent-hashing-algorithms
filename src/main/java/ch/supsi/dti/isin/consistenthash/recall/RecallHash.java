@@ -1,4 +1,4 @@
-package ch.supsi.dti.isin.consistenthash.recall_v1;
+package ch.supsi.dti.isin.consistenthash.recall;
 
 import java.util.Collection;
 
@@ -11,21 +11,21 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
 
 
 /**
- * Wrapper to adapt the {@link RecallV1Engine} to the {@link ConsistentHash} interface.
+ * Wrapper to adapt the {@link RecallEngine} to the {@link ConsistentHash} interface.
  * 
  * This wrapper performs all the consistency checks.
  *
  *
  * @author Massimo Coluzzi
  */
-public class RecallV1Hash implements ConsistentHash
+public class RecallHash implements ConsistentHash
 {
 
     /**
      * The {@code RecallHash} algorithm engine as described in:
      * {@code TBD}
      */
-    private final RecallV1Engine engine;
+    private final RecallEngine engine;
 
     /** One-to-one mapping between a node and the related bucket. */
     private final Indirection indirection;
@@ -36,7 +36,7 @@ public class RecallV1Hash implements ConsistentHash
      * 
      * @param initNodes nodes used to initialize the cluster
      */
-    public RecallV1Hash( Collection<? extends Node> initNodes )
+    public RecallHash( Collection<? extends Node> initNodes )
     {
 
         this( initNodes, DEFAULT_HASH_FUNCTION );
@@ -49,13 +49,13 @@ public class RecallV1Hash implements ConsistentHash
      * @param initNodes     nodes used to initialize the cluster
      * @param hashFunction  hash function to use 
      */
-    public RecallV1Hash( Collection<? extends Node> initNodes, HashFunction hashFunction )
+    public RecallHash( Collection<? extends Node> initNodes, HashFunction hashFunction )
     {
 
         super();
 
         final int size = Require.nonEmpty( initNodes, "The cluster must have at least one node" ).size();
-        this.engine = new RecallV1Engine(
+        this.engine = new RecallEngine(
                 size, 
                 Require.nonNull( hashFunction, "The hash function to use is mandatory" )
             );

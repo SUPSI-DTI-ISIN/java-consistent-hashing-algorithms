@@ -1,9 +1,9 @@
-package ch.supsi.dti.isin.consistenthash.recall_v1;
+package ch.supsi.dti.isin.consistenthash.recall;
 
 import ch.supsi.dti.isin.consistenthash.BucketBasedEngine;
 import ch.supsi.dti.isin.consistenthash.power.PowerEngine;
-import ch.supsi.dti.isin.consistenthash.recall_v1.HashTableV1.Pointer;
-import ch.supsi.dti.isin.consistenthash.recall_v1.HashTableV1.Replacement;
+import ch.supsi.dti.isin.consistenthash.recall.HashTable.Pointer;
+import ch.supsi.dti.isin.consistenthash.recall.HashTable.Replacement;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 
 
@@ -18,7 +18,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
  *
  * @author Massimo Coluzzi
  */
-public class RecallV1Engine implements BucketBasedEngine
+public class RecallEngine implements BucketBasedEngine
 { 
 
     /** The hash function to use. */
@@ -28,10 +28,10 @@ public class RecallV1Engine implements BucketBasedEngine
     final PowerEngine engine;
     
     /** The hash table collecting the replacements for the removed nodes, also addressed as replacement set. */
-    private final HashTableV1<Replacement> R;
+    private final HashTable<Replacement> R;
 
     /** The hash table storing the replacement chains in reverse order. */
-    private final HashTableV1<Pointer> I;
+    private final HashTable<Pointer> I;
 
     /**
      * Size of the related b-array.
@@ -50,15 +50,15 @@ public class RecallV1Engine implements BucketBasedEngine
      * @param size          initial number of working buckets (must be > 0)
      * @param hashFunction  hash function to use
      */
-    public RecallV1Engine( int size, HashFunction hashFunction )
+    public RecallEngine( int size, HashFunction hashFunction )
     {
         
         super();
         
         this.l = size;
         this.n = size;
-        this.R = new HashTableV1<>();
-        this.I = new HashTableV1<>();
+        this.R = new HashTable<>();
+        this.I = new HashTable<>();
 
         this.hashFunction = hashFunction;
         this.engine       = new PowerEngine( size, hashFunction );

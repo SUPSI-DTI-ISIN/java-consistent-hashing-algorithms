@@ -1,4 +1,4 @@
-package ch.supsi.dti.isin.consistenthash.recall_v1;
+package ch.supsi.dti.isin.consistenthash.recall;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -20,12 +20,12 @@ import ch.supsi.dti.isin.cluster.SimpleNode;
 import ch.supsi.dti.isin.consistenthash.ConsistentHashContract;
 
 /**
- * Test suite for the class {@link RecallV1Hash}.
+ * Test suite for the class {@link RecallHash}.
  * 
  * @author Massimo Coluzzi
  */
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class RecallHashTests implements ConsistentHashContract<RecallV1Hash>
+public class RecallHashTests implements ConsistentHashContract<RecallHash>
 {
 
     /* ******************* */
@@ -36,10 +36,10 @@ public class RecallHashTests implements ConsistentHashContract<RecallV1Hash>
      * {@inheritDoc}
      */
     @Override
-    public RecallV1Hash sampleValue( Collection<? extends Node> nodes )
+    public RecallHash sampleValue( Collection<? extends Node> nodes )
     {
 
-        return new RecallV1Hash( nodes );
+        return new RecallHash( nodes );
 
     }
 
@@ -56,7 +56,7 @@ public class RecallHashTests implements ConsistentHashContract<RecallV1Hash>
 
         assertThrows(
             RequirementFailure.class,
-            () -> new RecallV1Hash( nodes )
+            () -> new RecallHash( nodes )
         );
         
     }
@@ -67,7 +67,7 @@ public class RecallHashTests implements ConsistentHashContract<RecallV1Hash>
 
         assertThrows(
             RequirementFailure.class,
-            () -> new RecallV1Hash( Collections.singletonList(null) )
+            () -> new RecallHash( Collections.singletonList(null) )
         );
         
     }
@@ -82,7 +82,7 @@ public class RecallHashTests implements ConsistentHashContract<RecallV1Hash>
 
         assertThrows(
             RequirementFailure.class,
-            () -> new RecallV1Hash( nodes )
+            () -> new RecallHash( nodes )
         );
         
     }

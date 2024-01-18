@@ -1,4 +1,4 @@
-package ch.supsi.dti.isin.consistenthash.recall_v2;
+package ch.supsi.dti.isin.consistenthash.recall;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,12 +24,12 @@ import ch.supsi.dti.isin.Contract;
 import ch.supsi.dti.isin.consistenthash.ConsistentHash;
 
 /**
- * Test suite for the class {@link RecallV2Engine}.
+ * Test suite for the class {@link RecallEngine}.
  * 
  * @author Massimo Coluzzi
  */
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class RecallEngineTests implements Contract<RecallV2Engine> {
+public class RecallEngineTests implements Contract<RecallEngine> {
 
     public static final Random random = new Random();
 
@@ -38,14 +38,14 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     /* ******************* */
 
     /**
-     * Creates a new {@link RecallV2Engine} with the given size.
+     * Creates a new {@link RecallEngine} with the given size.
      * 
      * @param size size of the cluster
-     * @return new instance of {@link RecallV2Engine}
+     * @return new instance of {@link RecallEngine}
      */
-    public RecallV2Engine sampleValue(int size) {
+    public RecallEngine sampleValue(int size) {
 
-        return new RecallV2Engine(size, ConsistentHash.DEFAULT_HASH_FUNCTION);
+        return new RecallEngine(size, ConsistentHash.DEFAULT_HASH_FUNCTION);
 
     }
 
@@ -53,7 +53,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
      * {@inheritDoc}
      */
     @Override
-    public RecallV2Engine sampleValue() {
+    public RecallEngine sampleValue() {
 
         return sampleValue(10);
 
@@ -67,7 +67,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void a_new_created_engine_should_have_the_expected_size() {
 
         final int size = random.nextInt(100) + 1;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
         assertEquals(size, engine.bArraySize());
         assertEquals(size, engine.size());
 
@@ -77,7 +77,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void adding_a_new_bucket_in_a_full_cluster_should_increase_the_size() {
 
         final int size = random.nextInt(100) + 1;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
         engine.addBucket();
 
         assertEquals(size + 1, engine.size());
@@ -89,7 +89,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void adding_a_new_bucket_should_return_the_bucket_id_accordingly() {
 
         final int size = random.nextInt(100) + 1;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
         final int bucket = engine.addBucket();
 
         assertEquals(size, bucket);
@@ -102,7 +102,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
         final int size = random.nextInt(100) + 2;
         final int toRemove = random.nextInt(size - 1);
 
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
         final int removed = engine.removeBucket(toRemove);
         final int bucket = engine.addBucket();
 
@@ -114,7 +114,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void removing_and_adding_the_last_bucket_should_work_as_expected() {
 
         final int size = random.nextInt(100) + 1;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
 
         final int expected = size - 1;
         final int removed = engine.removeBucket(expected);
@@ -134,7 +134,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void removing_the_first_bucket_should_change_the_size_but_not_the_bArraySize() {
 
         final int size = random.nextInt(100) + 1;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
         engine.removeBucket(0);
 
         assertEquals(size - 1, engine.size());
@@ -146,7 +146,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void removing_the_last_bucket_should_change_both_the_size_and_the_bArraySize() {
 
         final int size = random.nextInt(100) + 1;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
         engine.removeBucket(size - 1);
 
         assertEquals(size - 1, engine.size());
@@ -158,7 +158,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void removing_buckets_except_the_last_should_not_change_the_bArraySize() {
 
         final int size = random.nextInt(100) + 1;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
         
         for( int b = 0; b < size - 1; ++b )
         {
@@ -178,7 +178,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
         final int size = random.nextInt(100) + 1;
         final int toRemove = random.nextInt(size);
 
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
         final int bucket = engine.removeBucket(toRemove);
         assertEquals(toRemove, bucket);
 
@@ -188,7 +188,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void when_buckets_except_the_last_are_removed_should_be_restored_in_reverse_order() {
 
         final int size = random.nextInt(100) + 1;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
 
         final List<Integer> toRemove = IntStream.range(0, size - 1).boxed().collect(toList());
         Collections.shuffle(toRemove);
@@ -209,7 +209,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void removing_and_adding_buckets_should_work_as_expected() {
 
         final int size = 6;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
 
         engine.removeBucket(0);
         engine.removeBucket(3);
@@ -231,7 +231,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     {
 
         final int size = 10;
-        final RecallV2Engine engine = sampleValue( size );
+        final RecallEngine engine = sampleValue( size );
 
         engine.removeBucket( 0 );
         engine.removeBucket( size-1 );
@@ -250,7 +250,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     @Test
     public void if_the_cluster_has_one_bucket_all_the_keys_should_land_to_such_a_bucket() {
 
-        final RecallV2Engine engine = sampleValue(1);
+        final RecallEngine engine = sampleValue(1);
 
         final Random random = new Random();
         for (int i = 0; i < 100; ++i) {
@@ -267,7 +267,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void if_all_buckets_are_removed_except_one_all_the_keys_should_land_to_such_a_bucket() {
 
         final int size = random.nextInt(100) + 1;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
 
         final List<Integer> toRemove = IntStream.range(0, size).boxed().collect(toList());
         Collections.shuffle(toRemove);
@@ -288,7 +288,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     @Test
     public void if_the_cluster_has_multiple_buckets_each_bucket_should_get_some_key() {
 
-        final RecallV2Engine engine = sampleValue();
+        final RecallEngine engine = sampleValue();
 
         final Map<Integer, AtomicInteger> map = IntStream
                 .range(0, 10)
@@ -318,7 +318,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     public void if_a_bucket_is_removed_only_the_keys_related_to_such_a_bucket_should_move() {
 
         final int size = 10;
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
         final Map<String, Integer> map = new HashMap<>();
 
         for (int i = 0; i < 1000; ++i) {
@@ -353,7 +353,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
         final int size = 100;
         final int keyCount = 1000;
 
-        final RecallV2Engine engine = sampleValue(size);
+        final RecallEngine engine = sampleValue(size);
 
         final Map<String, int[]> map = new HashMap<>();
         final List<String> keys = IntStream.generate(random::nextInt).limit(keyCount).mapToObj(String::valueOf)
@@ -396,7 +396,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
     /* **************** */
 
     private void recordOriginalKeyPositions(List<String> keys, int iterations, Map<String, int[]> map,
-            RecallV2Engine engine) {
+            RecallEngine engine) {
 
         for (String key : keys) {
 
@@ -411,7 +411,7 @@ public class RecallEngineTests implements Contract<RecallV2Engine> {
 
     }
 
-    private void recordKeyPositions(List<String> keys, int iteration, Map<String, int[]> map, RecallV2Engine engine) {
+    private void recordKeyPositions(List<String> keys, int iteration, Map<String, int[]> map, RecallEngine engine) {
 
         for (String key : keys) {
 

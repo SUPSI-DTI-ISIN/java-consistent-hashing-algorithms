@@ -1,4 +1,4 @@
-package ch.supsi.dti.isin.benchmark.adapter.consistenthash.recall_v1;
+package ch.supsi.dti.isin.benchmark.adapter.consistenthash.recall;
 
 
 import java.util.Collection;
@@ -11,8 +11,8 @@ import ch.supsi.dti.isin.benchmark.adapter.ResourceLoadingException;
 import ch.supsi.dti.isin.benchmark.config.AlgorithmConfig;
 import ch.supsi.dti.isin.cluster.Node;
 import ch.supsi.dti.isin.consistenthash.ConsistentHash;
-import ch.supsi.dti.isin.consistenthash.recall_v1.RecallV1Engine;
-import ch.supsi.dti.isin.consistenthash.recall_v1.RecallV1Hash;
+import ch.supsi.dti.isin.consistenthash.recall.RecallEngine;
+import ch.supsi.dti.isin.consistenthash.recall.RecallHash;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
 
 /**
@@ -21,7 +21,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
  * 
  * @author Massimo Coluzzi
  */
-public class RecallV1Factory extends ConsistentHashFactory
+public class RecallFactory extends ConsistentHashFactory
 {
 
 
@@ -30,7 +30,7 @@ public class RecallV1Factory extends ConsistentHashFactory
      * 
      * @param config the configuration to use
      */
-    public RecallV1Factory( AlgorithmConfig config )
+    public RecallFactory( AlgorithmConfig config )
     {
 
         super( config );
@@ -47,13 +47,13 @@ public class RecallV1Factory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public RecallV1Hash createConsistentHash( HashFunction hash, Collection<? extends Node> nodes )
+    public RecallHash createConsistentHash( HashFunction hash, Collection<? extends Node> nodes )
     {
 
         Require.nonNull( hash, "The hash function to use is mandatory" );
         Require.nonEmpty( nodes, "The initial cluster nodes are mandatory" );
 
-        return new RecallV1Hash( nodes, hash );
+        return new RecallHash( nodes, hash );
 
     }
 
@@ -61,13 +61,13 @@ public class RecallV1Factory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public Supplier<RecallV1Engine> createEngineInitializer( HashFunction hash, Collection<? extends Node> nodes )
+    public Supplier<RecallEngine> createEngineInitializer( HashFunction hash, Collection<? extends Node> nodes )
     {
 
         Require.nonNull( hash, "The hash function to use is mandatory" );
         Require.nonEmpty( nodes, "The initial cluster nodes are mandatory" );
 
-        return () -> new RecallV1Engine( nodes.size(), hash );
+        return () -> new RecallEngine( nodes.size(), hash );
 
     }
 
@@ -75,17 +75,17 @@ public class RecallV1Factory extends ConsistentHashFactory
      * {@inheritDoc}
      */
     @Override
-    public RecallV1EnginePilot createEnginePilot( ConsistentHash consistentHash )
+    public RecallEnginePilot createEnginePilot( ConsistentHash consistentHash )
     {
 
         final Object engine = Require.nonNull(
             consistentHash, "The consistent hash to pilot is mandatory"
         ).engine();
         
-        if( engine instanceof RecallV1Engine )
-            return new RecallV1EnginePilot( (RecallV1Engine) engine );
+        if( engine instanceof RecallEngine )
+            return new RecallEnginePilot( (RecallEngine) engine );
 
-        throw ResourceLoadingException.incompatibleType( RecallV1Engine.class, engine.getClass() );
+        throw ResourceLoadingException.incompatibleType( RecallEngine.class, engine.getClass() );
 
     }
 
