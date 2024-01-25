@@ -45,13 +45,14 @@ public class HashTableTests
         final HashTable<EmptyEntry> hashTable = new HashTable<>();
         assertEquals( 0, hashTable.size() );
 
-        final EmptyEntry entry = new EmptyEntry( random.nextInt(100) );
+        final int bucket = random.nextInt( 100 );
+        final EmptyEntry entry = new EmptyEntry( bucket );
         hashTable.add( entry );
         assertEquals( 1, hashTable.size() );
 
-        final EmptyEntry storedEntry = hashTable.get( entry.bucket );
+        final EmptyEntry storedEntry = hashTable.get( bucket );
         assertNotNull( storedEntry );
-        assertEquals( entry.bucket, storedEntry.bucket );
+        assertEquals( entry, storedEntry );
 
     }
 
@@ -60,30 +61,33 @@ public class HashTableTests
     {
 
         final HashTable<EmptyEntry> hashTable = new HashTable<>();
-        final EmptyEntry entry1 = new EmptyEntry( random.nextInt(100) );
-        final EmptyEntry entry2 = new EmptyEntry( random.nextInt(100) );
 
+        final int bucket1 = random.nextInt( 100 );
+        final EmptyEntry entry1 = new EmptyEntry( bucket1 );
         hashTable.add( entry1 );
+        
+        final int bucket2 = random.nextInt( 100 ) + 100;
+        final EmptyEntry entry2 = new EmptyEntry( bucket2 );
         hashTable.add( entry2 );
 
         assertEquals( 2, hashTable.size() );
-        final EmptyEntry storedEntry1 = hashTable.get( entry1.bucket );
-        final EmptyEntry storedEntry2 = hashTable.get( entry2.bucket );
-        
+        final EmptyEntry storedEntry1 = hashTable.get( bucket1 );
         assertNotNull( storedEntry1 );
+
+        final EmptyEntry storedEntry2 = hashTable.get( bucket2 );
         assertNotNull( storedEntry2 );
+        
+        assertEquals( entry1, storedEntry1 );
+        assertEquals( entry2, storedEntry2 );
 
-        assertEquals( entry1.bucket, storedEntry1.bucket );
-        assertEquals( entry2.bucket, storedEntry2.bucket );
-
-        hashTable.rem( entry1.bucket );
-        assertNull( hashTable.get(entry1.bucket) );
-        assertNotNull( hashTable.get(entry2.bucket) );
+        hashTable.rem( bucket1 );
+        assertNull( hashTable.get(bucket1) );
+        assertNotNull( hashTable.get(bucket2) );
         assertEquals( 1, hashTable.size() );
         
-        hashTable.rem( entry2.bucket );
-        assertNull( hashTable.get(entry1.bucket) );
-        assertNull( hashTable.get(entry2.bucket) );
+        hashTable.rem( bucket2 );
+        assertNull( hashTable.get(bucket1) );
+        assertNull( hashTable.get(bucket2) );
         assertEquals( 0, hashTable.size() );
 
     }
@@ -93,22 +97,26 @@ public class HashTableTests
     {
 
         final HashTable<EmptyEntry> hashTable = new HashTable<>();
-        final EmptyEntry entry1 = new EmptyEntry( random.nextInt(100) );
-        final EmptyEntry entry2 = new EmptyEntry( random.nextInt(100) );
 
+        final int bucket1 = random.nextInt( 100 );
+        final EmptyEntry entry1 = new EmptyEntry( bucket1 );
         hashTable.add( entry1 );
+        
+        final int bucket2 = random.nextInt( 100 );
+        final EmptyEntry entry2 = new EmptyEntry( bucket2 );
         hashTable.add( entry2 );
+
 
         assertEquals( 2, hashTable.size() );
         
-        hashTable.rem( entry1.bucket );
-        assertNull( hashTable.get(entry1.bucket) );
-        assertNotNull( hashTable.get(entry2.bucket) );
+        hashTable.rem( bucket1 );
+        assertNull( hashTable.get(bucket1) );
+        assertNotNull( hashTable.get(bucket2) );
         assertEquals( 1, hashTable.size() );
         
-        assertDoesNotThrow( () -> hashTable.rem(entry1.bucket) );
-        assertNull( hashTable.get(entry1.bucket) );
-        assertNotNull( hashTable.get(entry2.bucket) );
+        assertDoesNotThrow( () -> hashTable.rem(bucket1) );
+        assertNull( hashTable.get(bucket1) );
+        assertNotNull( hashTable.get(bucket2) );
         assertEquals( 1, hashTable.size() );
         
     }
@@ -221,7 +229,6 @@ public class HashTableTests
         final int p = random.nextInt( 100 );
     
         final Replacement replacement = new Replacement( b, r, w, p );
-        assertEquals( b, replacement.bucket );
         assertEquals( r, replacement.r );
         assertEquals( w, replacement.w );
         assertEquals( p, replacement.p );
@@ -236,7 +243,6 @@ public class HashTableTests
         final int v = random.nextInt( 100 );
     
         final Pointer pointer = new Pointer( b, v );
-        assertEquals( b, pointer.bucket );
         assertEquals( v, pointer.value );
 
     }

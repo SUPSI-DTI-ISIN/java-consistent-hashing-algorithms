@@ -1,9 +1,13 @@
 package ch.supsi.dti.isin.consistenthash.recall;
 
-import org.nerd4j.utils.lang.ToString;
+import org.nerd4j.utils.lang.Equals;
 
 /**
- * Represents the replacement set lookup table.
+ * Implementation of an optimized hash table solution.
+ * 
+ * <p>
+ * This implementation uses the same algorithm used by {@link java.util.HashMap}.
+ * Still, it optimizes the entry data structures, avoiding the proliferation of objects.
  * 
  * @param <E> the table entry implementation to use
  * 
@@ -65,14 +69,19 @@ class HashTable<E extends HashTable.Entry>
         Entry entry = table[index];
         while( entry != null )
         {
+
             if( entry.bucket == bucket )
             {
+
                 @SuppressWarnings("unchecked")
                 final E e = (E) entry;
+                
                 return e;
+
             }
 
             entry = entry.next;
+
         }
 
         return null;
@@ -234,7 +243,7 @@ class HashTable<E extends HashTable.Entry>
     }
 
     /**
-     * Resizes the lookup table by creating a new table and cloning
+     * Resizes the lookup table by creating a new table and copying
      * the entries in the old table into the new one.
      * 
      * @param newTableSize the size of the new lookup table
@@ -282,7 +291,7 @@ class HashTable<E extends HashTable.Entry>
     {
 
         /** The bucket this entry refers to. */
-        final int bucket;
+        final private int bucket;
 
         /** Used if multiple entries have the same hashcode. */
         private Entry next;
@@ -291,36 +300,49 @@ class HashTable<E extends HashTable.Entry>
         /**
          * Constructor with parameters.
          * 
-         * @param bucket      the removed bucket
+         * @param bucket the removed bucket
          */
         protected Entry( int bucket )
         {
             
             super();
 
-            this.next        = null;
-            this.bucket      = bucket;
+            this.next   = null;
+            this.bucket = bucket;
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals( Object other )
+        {
+            
+            return Equals.ifSameClass(
+                this, other,
+                o -> o.bucket
+            );
 
         }
 
     }
 
     /**
-     * Represents the replacement of a failed bucket.
+     * Represents a replacement entry in the replacement set.
      * 
      * @author Massimo Coluzzi
      */
     static class Replacement extends Entry
     {
 
-        /**
-         * Represents the bucket that will replace the current one.
-         * This value also represents the size of the working set
-         * after the removal of the current bucket.
-         */
+        /** Represents the bucket that will replace the current one. */
         int r;
 
-        /** Size of the working set after the removal of the bucket. */
+        /**
+         * Size of the working set after the removal of the bucket.
+         * This value also represents the next bucket in the replacement chain.
+         */
         final int w;
 
         /** Keep track of the bucket removed before the current one. */
@@ -343,19 +365,6 @@ class HashTable<E extends HashTable.Entry>
             this.r = r;
             this.w = w;
             this.p = p;
-
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString()
-        {
-
-            return ToString.of( this )
-                .print( bucket, r, p )
-                .likeTuple();
 
         }
 
@@ -390,19 +399,6 @@ class HashTable<E extends HashTable.Entry>
             super( bucket );
 
             this.value = value;
-
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString()
-        {
-
-            return ToString.of( this )
-                .print( bucket, value )
-                .likeTuple();
 
         }
 

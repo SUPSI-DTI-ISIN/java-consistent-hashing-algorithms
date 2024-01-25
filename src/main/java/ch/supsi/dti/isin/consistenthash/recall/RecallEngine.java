@@ -1,5 +1,7 @@
 package ch.supsi.dti.isin.consistenthash.recall;
 
+import org.nerd4j.utils.lang.Require;
+
 import ch.supsi.dti.isin.consistenthash.BucketBasedEngine;
 import ch.supsi.dti.isin.consistenthash.power.PowerEngine;
 import ch.supsi.dti.isin.consistenthash.recall.HashTable.Pointer;
@@ -55,8 +57,8 @@ public class RecallEngine implements BucketBasedEngine
         
         super();
         
-        this.l = size;
-        this.n = size;
+        this.l = this.n = Require.trueFor( size, size > 0, "The size of the cluster must be greater than 0");
+
         this.R = new HashTable<>();
         this.I = new HashTable<>();
 
@@ -110,10 +112,21 @@ public class RecallEngine implements BucketBasedEngine
             /* We check if the new bucket has been removed as well. */
             b_rep = R.get( b );
 
+            if( b_rep == null )
+                return b;
+
+            if( b_rep.w >= w_b )
+            {
+                b = b_rep.r;
+                b_rep = R.get( b );
+            }
+            
+
             /*
-             * If the new bucket b is working or if it was removed
-             * before the original b, then we are done. Otherwise,
-             * we perform another iteration of the loop.
+             * If the new bucket b is working, we are done (the next check will exit the loop).
+             * If it was removed after the original b, we would perform another iteration.
+             * Otherwise, it was removed before the original b.
+             * In this case, we use the replacing bucket (which is supposed to be working).
              */
             if( b_rep != null && b_rep.w >= w_b )
             {
@@ -150,9 +163,13 @@ public class RecallEngine implements BucketBasedEngine
          */
         if( R.isEmpty() )
         {
+
+            /* We must update the underlying engine accordingly. */
             engine.addBucket();
+
             l = n = n + 1;
             return b;
+            
         }
 
         /* Otherwise, we must restore the last removed bucket. */
@@ -220,10 +237,13 @@ public class RecallEngine implements BucketBasedEngine
          */
         if( b == n - 1 && R.isEmpty() )
         {
+
+            /* We must update the underlying engine accordingly. */
             engine.removeBucket( b );
-            l = n = n - 1;
-            
+
+            l = n = b;
             return b;
+
         }
         
         /* Otherwise, we need to remember the removed bucket. */

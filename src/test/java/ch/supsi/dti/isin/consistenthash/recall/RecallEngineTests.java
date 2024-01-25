@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
@@ -19,6 +20,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import org.nerd4j.utils.lang.RequirementFailure;
 
 import ch.supsi.dti.isin.Contract;
 import ch.supsi.dti.isin.consistenthash.ConsistentHash;
@@ -62,6 +64,15 @@ public class RecallEngineTests implements Contract<RecallEngine> {
     /* ************** */
     /* TEST METHODS */
     /* ************** */
+
+    @Test
+    public void the_size_must_be_greater_than_0() {
+
+        final int size = random.nextInt(100) + 1;
+
+        assertThrows( RequirementFailure.class, () -> new RecallEngine(-size,ConsistentHash.DEFAULT_HASH_FUNCTION) );
+
+    }
 
     @Test
     public void a_new_created_engine_should_have_the_expected_size() {
@@ -356,36 +367,39 @@ public class RecallEngineTests implements Contract<RecallEngine> {
         final RecallEngine engine = sampleValue(size);
 
         final Map<String, int[]> map = new HashMap<>();
-        final List<String> keys = IntStream.generate(random::nextInt).limit(keyCount).mapToObj(String::valueOf)
-                .collect(toList());
+        final List<String> keys = IntStream
+            .generate( random::nextInt )
+            .limit( keyCount )
+            .mapToObj( String::valueOf )
+            .collect( toList() );
 
-        recordOriginalKeyPositions(keys, 1, map, engine);
+        recordOriginalKeyPositions( keys, 1, map, engine );
 
-        final int removed = random.nextInt(size);
-        engine.removeBucket(removed);
-        for (String key : keys) {
+        final int removed = random.nextInt( size );
+        engine.removeBucket( removed );
+        for( String key : keys ) {
 
-            final int previous = map.get(key)[0];
-            final int current = engine.getBucket(key);
+            final int previous = map.get( key )[0];
+            final int current = engine.getBucket(  key );
 
-            if (previous == removed)
-                assertNotEquals(previous, current);
+            if( previous == removed )
+                assertNotEquals( previous, current );
             else
-                assertEquals(previous, current);
+                assertEquals( previous, current );
 
         }
 
-        recordKeyPositions(keys, 0, map, engine);
+        recordKeyPositions( keys, 0, map, engine );
         engine.addBucket();
-        for (String key : keys) {
+        for( String key : keys ) {
 
-            final int previous = map.get(key)[1];
-            final int current = engine.getBucket(key);
+            final int previous = map.get( key )[1];
+            final int current = engine.getBucket( key );
 
-            if (current == removed)
-                assertNotEquals(previous, current);
+            if( current == removed )
+                assertNotEquals( previous, current );
             else
-                assertEquals(previous, current);
+                assertEquals( previous, current );
 
         }
 
@@ -395,8 +409,7 @@ public class RecallEngineTests implements Contract<RecallEngine> {
     /*  HELPER METHODS  */
     /* **************** */
 
-    private void recordOriginalKeyPositions(List<String> keys, int iterations, Map<String, int[]> map,
-            RecallEngine engine) {
+    private void recordOriginalKeyPositions(List<String> keys, int iterations, Map<String, int[]> map, RecallEngine engine) {
 
         for (String key : keys) {
 

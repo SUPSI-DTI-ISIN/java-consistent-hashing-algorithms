@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -245,7 +247,7 @@ public class BenchmarkExecutionUtilsTests
 
         final Map<String,Object> conf = Map.of(
             "name", "test",
-            "args", Map.of( "removal-rates", List.of(0,badValue,0.9) )
+            "args", Map.of( "removal-rates", Stream.of(0,badValue,0.9).collect(Collectors.toList()) )
         );
         final CommonConfig common = CommonConfig.of( ValuePath.root(), null );
         final BenchmarkConfig benchmark = BenchmarkConfig.of( ValuePath.root(), common, conf );
