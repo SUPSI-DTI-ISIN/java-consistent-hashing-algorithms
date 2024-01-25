@@ -96,19 +96,19 @@ benchmarks:
 
     # Benchmarks the time needed to find which node a given key belongs.
     # - name: lookup-time
-    #   # Can be used to override any common configuration.
-    #   common:
-    #   # Used to define any benchmark specific argument.
-    #   args:
-    #       # A number 0 <= x < 1 defining the percentage of initial nodes to remove
-    #       # before performing the benchmark. This value defaults to 0
-    #       # (The value cannot be 1 because 100% of the nodes cannot be removed).
-    #       removal-rate: 0.2
-    #       # Defines the order of nodes removal. Valid values for this property are:
-    #       # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
-    #       # Note that not all the algorithms support any removal order.
-    #       # For example Jump supports removals only in LIFO order.
-    #       removal-order: random
+      # # Can be used to override any common configuration.
+      # common:
+      # # Used to define any benchmark specific argument.
+      # args:
+      #     # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+      #     # before performing the benchmark. This value defaults to 0
+      #     # (The value cannot be 1 because 100% of the nodes cannot be removed).
+      #     removal-rate: 0
+      #     # Defines the order of nodes removal. Valid values for this property are:
+      #     # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+      #     # Note that not all the algorithms support any removal order.
+      #     # For example Jump supports removals only in LIFO order.
+      #     removal-order: lifo
 
     # Benchmarks the time needed by the algorithm to update its internal data structure when the cluster get resized.
     # - name: resize-time
@@ -196,29 +196,12 @@ benchmarks:
 
     # Benchmarks the time needed to find which node a given key belongs.
     # This version keeps the cluster size fixed and incrementally removes the nodes.
-    # - name: incremental-lookup-time
-    #   # Can be used to override any common configuration.
-    #   common:
-    #   # Used to define any benchmark specific argument.
-    #   # property with a fixed value.
-    #     init-nodes: [1000]
-    #   args:
-    #     # Represents the persentage of nodes to remove.
-    #     # Every value in the list must be a number 0 <= x < 1
-    #     # defining the percentage of initial nodes to remove
-    #     # before performing the benchmark.
-    #     # This value defaults to [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    #     # representing an incremental removal from 0% to 90% of the initial nodes.
-    #     removal-rates: []
-
-    # Benchmarks the amount of RAM (in bytes) used by the algorithm.
-    # This version keeps the cluster size fixed and incrementally removes the nodes.
-    - name: incremental-memory-usage
+    - name: incremental-lookup-time
       # Can be used to override any common configuration.
       common:
       # Used to define any benchmark specific argument.
-        # property with a fixed value.
-        init-nodes: [1000_000]
+      # property with a fixed value.
+        init-nodes: [1000]
       args:
         # Represents the persentage of nodes to remove.
         # Every value in the list must be a number 0 <= x < 1
@@ -227,3 +210,20 @@ benchmarks:
         # This value defaults to [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
         # representing an incremental removal from 0% to 90% of the initial nodes.
         removal-rates: []
+
+    # Benchmarks the amount of RAM (in bytes) used by the algorithm.
+    # This version keeps the cluster size fixed and incrementally removes the nodes.
+    # - name: incremental-memory-usage
+    #   # Can be used to override any common configuration.
+    #   common:
+    #   # Used to define any benchmark specific argument.
+    #     # property with a fixed value.
+    #     init-nodes: [1000_000]
+    #   args:
+    #     # Represents the persentage of nodes to remove.
+    #     # Every value in the list must be a number 0 <= x < 1
+    #     # defining the percentage of initial nodes to remove
+    #     # before performing the benchmark.
+    #     # This value defaults to [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    #     # representing an incremental removal from 0% to 90% of the initial nodes.
+    #     removal-rates: []

@@ -81,7 +81,7 @@ public class LookupTime extends BenchmarkExecutor
         final IterationsConfig iterations = common.getIterations();
                 
         final Options opt = new OptionsBuilder()
-            .include( LookupTime.LookupTimeExecutor.class.getSimpleName() )
+            .include( LookupTime.LookupTimeExecutor.class.getCanonicalName() )
 
             .param( "benchmark", benchmarks )
             .param( "function", functions )

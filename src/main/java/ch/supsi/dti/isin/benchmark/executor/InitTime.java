@@ -76,7 +76,7 @@ public class InitTime extends BenchmarkExecutor
         final IterationsConfig iterations = common.getIterations();
 
         final Options opt = new OptionsBuilder()
-            .include( InitTime.InitTimeExecutor.class.getSimpleName() )
+            .include( InitTime.InitTimeExecutor.class.getCanonicalName() )
 
             .param( "function", functions )
             .param( "initNodes", initNodes )

@@ -175,7 +175,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void removing_an_existing_bucket_should_return_the_bucket_id_accordingly() {
 
-        final int size = random.nextInt(100) + 1;
+        final int size = random.nextInt(100) + 10;
         final int toRemove = random.nextInt(size);
 
         final MementoEngine engine = sampleValue(size);

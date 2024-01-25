@@ -79,7 +79,7 @@ public class ResizeTime extends BenchmarkExecutor
         final TimeConfig time = common.getTime();
 
         final Options opt = new OptionsBuilder()
-            .include( ResizeTime.ResizeTimeExecutor.class.getSimpleName() )
+            .include( ResizeTime.ResizeTimeExecutor.class.getCanonicalName() )
 
             .param( "benchmark", benchmarks )
             .param( "function", functions )

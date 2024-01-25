@@ -83,8 +83,8 @@ public class IncrementalLookupTime extends BenchmarkExecutor
         final IterationsConfig iterations = common.getIterations();
                 
         final Options opt = new OptionsBuilder()
-            .include( IncrementalLookupTime.IncrementalLookupTimeExecutor.class.getSimpleName() )
-
+            .include( IncrementalLookupTime.IncrementalLookupTimeExecutor.class.getCanonicalName() )
+            
             .param( "benchmark", benchmarks )
             .param( "function", functions )
             .param( "initNodes", initNodes )
