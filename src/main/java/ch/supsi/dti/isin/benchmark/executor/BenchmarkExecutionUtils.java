@@ -230,7 +230,7 @@ public class BenchmarkExecutionUtils
         if( consistentHash.supportsRandomRemovals() )
             Collections.shuffle( nodes );
         else
-            nodes = nodes.reversed();
+            Collections.reverse( nodes );
 
         final List<Node> toRemove = nodes.subList( 0, removeCount );
         consistentHash.removeNodes( toRemove );
