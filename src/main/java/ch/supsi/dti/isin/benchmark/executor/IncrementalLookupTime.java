@@ -84,7 +84,7 @@ public class IncrementalLookupTime extends BenchmarkExecutor
                 
         final Options opt = new OptionsBuilder()
             .include( IncrementalLookupTime.IncrementalLookupTimeExecutor.class.getCanonicalName() )
-            
+
             .param( "benchmark", benchmarks )
             .param( "function", functions )
             .param( "initNodes", initNodes )
@@ -96,7 +96,7 @@ public class IncrementalLookupTime extends BenchmarkExecutor
             .result( file.toString() )
 
             .shouldDoGC( common.isGc() )
-            .forks( 0 )
+            .forks( 1 )
 
             .mode( Mode.AverageTime )
             .timeUnit( time.getUnit() )
