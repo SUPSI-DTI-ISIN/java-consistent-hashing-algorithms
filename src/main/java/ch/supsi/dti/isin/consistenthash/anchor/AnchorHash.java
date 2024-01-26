@@ -147,10 +147,11 @@ public class AnchorHash implements ConsistentHash
     /**
      * {@inheritDoc}}
      */
-    public boolean supportsRandomRemovals()
+    @Override
+    public boolean supportsOnlyLifoRemovals()
     {
 
-        return true;
+        return false;
 
     }
 

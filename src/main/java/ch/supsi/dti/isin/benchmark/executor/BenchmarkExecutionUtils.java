@@ -227,10 +227,10 @@ public class BenchmarkExecutionUtils
         if( removeCount <= 0 )
             return;
             
-        if( consistentHash.supportsRandomRemovals() )
-            Collections.shuffle( nodes );
-        else
+        if( consistentHash.supportsOnlyLifoRemovals() )
             Collections.reverse( nodes );
+        else
+            Collections.shuffle( nodes );
 
         final List<Node> toRemove = nodes.subList( 0, removeCount );
         consistentHash.removeNodes( toRemove );
@@ -251,7 +251,7 @@ public class BenchmarkExecutionUtils
     )
     {
 
-        final List<Node> toRemove = getNodesToRemove( benchmarkConfig, nodes );
+        final List<Node> toRemove = getNodesToRemove( benchmarkConfig, consistentHash, nodes );
         if( IsNot.empty(toRemove) )
             consistentHash.removeNodes( toRemove );
 
@@ -273,7 +273,9 @@ public class BenchmarkExecutionUtils
      * @param nodes list of nodes
      * @return nodes to remove or {@code null}
      */
-    private static List<Node> getNodesToRemove( BenchmarkConfig benchmarkConfig, Collection<Node> nodes )
+    private static List<Node> getNodesToRemove(
+        BenchmarkConfig benchmarkConfig, ConsistentHash consistentHash, Collection<Node> nodes
+    )
     {
 
         final float removalRate = getRemovalRate( benchmarkConfig );
@@ -282,7 +284,10 @@ public class BenchmarkExecutionUtils
 
         final List<Node> toRemove = new ArrayList<>( nodes );
         final int nodesToRemove = (int)(nodes.size() * removalRate);
-        final RemovalOrder removalOrder = getRemovalOrder( benchmarkConfig );
+
+        RemovalOrder removalOrder = getRemovalOrder( benchmarkConfig );
+        if( consistentHash.supportsOnlyLifoRemovals() )
+            removalOrder = RemovalOrder.LIFO;
 
         switch( removalOrder )
         {

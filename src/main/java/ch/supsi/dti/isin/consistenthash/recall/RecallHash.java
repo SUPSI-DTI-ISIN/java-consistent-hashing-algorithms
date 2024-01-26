@@ -144,10 +144,10 @@ public class RecallHash implements ConsistentHash
      * {@inheritDoc}}
      */
     @Override
-    public boolean supportsRandomRemovals()
+    public boolean supportsOnlyLifoRemovals()
     {
 
-        return true;
+        return false;
 
     }
 

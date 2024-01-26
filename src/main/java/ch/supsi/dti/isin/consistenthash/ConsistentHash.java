@@ -56,11 +56,11 @@ public interface ConsistentHash
     void removeNodes( Collection<? extends Node> nodes );
 
     /**
-     * Tells if the algorithm supports the removal of random nodes.
+     * Tells if the algorithm supports only removals in LIFO order.
      * 
-     * @return {@code true} if nodes can be removed randomly
+     * @return {@code true} if nodes can be removed only in LIFO order.
      */
-    boolean supportsRandomRemovals();
+    boolean supportsOnlyLifoRemovals();
 
     /**
      * Returns the number of nodes in the cluster.
