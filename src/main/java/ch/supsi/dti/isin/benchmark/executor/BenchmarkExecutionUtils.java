@@ -280,7 +280,7 @@ public class BenchmarkExecutionUtils
 
         final float removalRate = getRemovalRate( benchmarkConfig );
         if( removalRate <= 0 )
-            return null;
+            return Collections.emptyList();
 
         final List<Node> toRemove = new ArrayList<>( nodes );
         final int nodesToRemove = (int)(nodes.size() * removalRate);
