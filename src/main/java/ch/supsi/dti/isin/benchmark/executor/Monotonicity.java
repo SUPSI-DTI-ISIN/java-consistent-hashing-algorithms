@@ -594,6 +594,12 @@ public class Monotonicity extends BenchmarkExecutor
 
             keys.get( key ).set( phase, index );
 
+            // final Position p = keys.get( key );
+            // final int from = p.get( Phase.BEFORE_REMOVE );
+            // final int to   = p.get( Phase.AFTER_REMOVE );
+            // if( from < smallestRemovedIndex && to < smallestRemovedIndex && from != to )
+            //     System.out.println( key );
+
         }
 
         /**

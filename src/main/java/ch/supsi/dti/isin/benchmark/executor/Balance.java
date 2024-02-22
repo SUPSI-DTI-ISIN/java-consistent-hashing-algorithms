@@ -6,11 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+
+import org.nerd4j.utils.tuple.ComparablePair;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
 import ch.supsi.dti.isin.benchmark.config.BenchmarkConfig;
@@ -194,11 +195,11 @@ public class Balance extends BenchmarkExecutor
      * @param nodesCount number of nodes to create
      * @return the set of nodes to use
      */
-    private Set<Node> getNodes( int nodesCount )
+    private List<Node> getNodes( int nodesCount )
     {
 
         final List<Node> nodes = SimpleNode.create( nodesCount );
-        return new HashSet<>( nodes );
+        return nodes;
 
     }
 
@@ -221,15 +222,13 @@ public class Balance extends BenchmarkExecutor
     {
 
         final String algorithm = factory.getConfig().getName();
-        final Set<Node> nodes = getNodes( nodesCount );
+        final List<Node> nodes = getNodes( nodesCount );
 
         final ConsistentHash consistentHash = factory.createConsistentHash( function, nodes );
         final List<Node> removed = BenchmarkExecutionUtils.removeNodesIfNeeded( config, consistentHash, nodes );
         nodes.removeAll( removed );
 
         final Metrics metrics = new Metrics( function.name(), algorithm, nodes, distribution, keysCount, iterations );
-        for( Node r : removed )
-            nodes.remove( r );
 
         for( int i = 0; i < iterations; ++i )
         {
@@ -256,6 +255,16 @@ public class Balance extends BenchmarkExecutor
 
             final long end = System.currentTimeMillis();
             final long time = end - start;
+
+            System.out.println();
+            metrics.counts.get(0).entrySet().stream()
+                .sorted( (a,b) -> {
+                    Integer x = Integer.valueOf( a.getKey().name().substring(5) );
+                    Integer y = Integer.valueOf( b.getKey().name().substring(5) );
+
+                    return x.compareTo( y );
+                })
+                .forEach( e -> System.out.println( e.getKey().name().substring(5) + ": " + e.getValue() ));
 
             System.out.println("-> [" + metrics.getMinCount(i + 1) + ","
                     + metrics.getMaxCount(i + 1) + "] in " + time + "ms");
@@ -308,7 +317,7 @@ public class Balance extends BenchmarkExecutor
          */
         public Metrics(
                 String function, String algorithm,
-                Set<Node> nodes, Distribution distribution,
+                List<Node> nodes, Distribution distribution,
                 int keysCount, int iterations
         )
         {

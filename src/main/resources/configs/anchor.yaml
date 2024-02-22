@@ -12,11 +12,11 @@ common:
         # Number of non-recorded iterations of a benchmark. Used to warm up the JVM.
         # The warm-up iterations will not be run for benchmarks that doesn't benefit from it.
         # Default value is 5.
-        warmup: 5
+        warmup: 10
 
         # How many times a single benchmark will be executed.
         # Default value is 5.
-        execution: 5
+        execution: 10
 
     # Configurations that apply only to time based benchmarks.
     time:
@@ -42,13 +42,8 @@ common:
     # Number of initial active nodes.
     # At least one positive value must be provided.
     # Benchmarks will run for every specified cluster size.
-    # init-nodes: [10, 100, 1000, 10_000, 100_000]
-    init-nodes: [9, 129, 1025, 8193, 131_073]
-    # init-nodes: [12, 196, 1540, 12288, 98304]
-    # init-nodes: [10]
-    # init-nodes: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-    # init-nodes: [11,10, 9, 8]
-    # init-nodes: [1025,1280,1536,1792,2047]
+    init-nodes: [1000_000]
+    
 
     # Hash functions used by the consistent hashing algorithms.
     # The list shows the currently implemented functions.
@@ -60,32 +55,30 @@ common:
     # At least one distribution must be provided.
     # Benchmarks will run for every specified key distribution.
     key-distributions:
-    # - custom
-    - uniform
-    # - normal
+    - custom
 
 # List of algorithms to be benchmarked. The list shows the currently implemented CH algorithms.
 # If you add an algorithm called MyAlgo, the tool will search for a class named "MyAlgoFactory"
 # that implements the ConsistentHashFactory interface. Every entry in the list must provide
 # the algorithm name and an optional list of arguments to use during creation.
 algorithms:
-    # - name: anchor
-    #   args:
-    #       # The value is multiplied by the number of initial active nodes to find the capacity.
-    #       # E.g., capacity=10 means that the overall capacity of the cluster is 10 times the initial number of working nodes.
-    #       # Default value for the capacity is 10.
-    #       capacity: 10
-    - name: binomial
+    - name: anchor
+      args:
+          # The value is multiplied by the number of initial active nodes to find the capacity.
+          # E.g., capacity=10 means that the overall capacity of the cluster is 10 times the initial number of working nodes.
+          # Default value for the capacity is 10.
+          capacity: 1
+    # - name: binomial
             # No arguments
-    # - name: dx
-    #   args: 
-    #       # Same as above.
-    #       capacity: 10
+    - name: dx
+      args: 
+          # Same as above.
+          capacity: 1
     # - name: jump
     #       # No arguments
-    # - name: memento
-    #       # No arguments
-    - name: power
+    - name: memento 
+          # No arguments
+    # - name: power
           # No arguments
     # - name: recall
     #       # No arguments
@@ -117,7 +110,7 @@ benchmarks:
           # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
           # Note that not all the algorithms support any removal order.
           # For example Jump supports removals only in LIFO order.
-          removal-order: lifo
+          removal-order: random
 
     # Benchmarks the time needed by the algorithm to update its internal data structure when the cluster get resized.
     # - name: resize-time
@@ -144,7 +137,7 @@ benchmarks:
     #     # A number 0 <= x < 1 defining the percentage of initial nodes to remove
     #     # before performing the benchmark. This value defaults to 0
     #     # (The value cannot be 1 because 100% of the nodes cannot be removed).
-    #     removal-rate: 0.2
+    #     removal-rate: 0.9
     #     # Defines the order of nodes removal. Valid values for this property are:
     #     # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
     #     # Note that not all the algorithms support any removal order.

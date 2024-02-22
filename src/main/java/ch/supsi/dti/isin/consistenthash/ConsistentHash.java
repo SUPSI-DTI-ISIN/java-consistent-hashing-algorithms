@@ -27,7 +27,7 @@ public interface ConsistentHash
 {
 
     /** The {@link HashFunction.Algorithm} to be used by default in consistent hash algorithms. */
-    public static final HashFunction.Algorithm DEFAULT_HASH_ALGOTITHM = HashFunction.Algorithm.MURMUR3;
+    public static final HashFunction.Algorithm DEFAULT_HASH_ALGOTITHM = HashFunction.Algorithm.XX;
 
     /** The {@link HashFunction} to be used by default in consistent hash algorithms. */
     public static final HashFunction DEFAULT_HASH_FUNCTION = HashFunction.create( DEFAULT_HASH_ALGOTITHM );

@@ -12,11 +12,11 @@ common:
         # Number of non-recorded iterations of a benchmark. Used to warm up the JVM.
         # The warm-up iterations will not be run for benchmarks that doesn't benefit from it.
         # Default value is 5.
-        warmup: 5
+        warmup: 0
 
         # How many times a single benchmark will be executed.
         # Default value is 5.
-        execution: 5
+        execution: 1
 
     # Configurations that apply only to time based benchmarks.
     time:
@@ -43,10 +43,8 @@ common:
     # At least one positive value must be provided.
     # Benchmarks will run for every specified cluster size.
     # init-nodes: [10, 100, 1000, 10_000, 100_000]
-    init-nodes: [9, 129, 1025, 8193, 131_073]
-    # init-nodes: [12, 196, 1540, 12288, 98304]
     # init-nodes: [10]
-    # init-nodes: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    init-nodes: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
     # init-nodes: [11,10, 9, 8]
     # init-nodes: [1025,1280,1536,1792,2047]
 
@@ -85,7 +83,7 @@ algorithms:
     #       # No arguments
     # - name: memento
     #       # No arguments
-    - name: power
+    # - name: power
           # No arguments
     # - name: recall
     #       # No arguments
@@ -104,20 +102,20 @@ benchmarks:
     #   args:
 
     # # Benchmarks the time needed to find which node a given key belongs.
-    - name: lookup-time
-      # Can be used to override any common configuration.
-      common:
-      # Used to define any benchmark specific argument.
-      args:
-          # A number 0 <= x < 1 defining the percentage of initial nodes to remove
-          # before performing the benchmark. This value defaults to 0
-          # (The value cannot be 1 because 100% of the nodes cannot be removed).
-          removal-rate: 0
-          # Defines the order of nodes removal. Valid values for this property are:
-          # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
-          # Note that not all the algorithms support any removal order.
-          # For example Jump supports removals only in LIFO order.
-          removal-order: lifo
+    # - name: lookup-time
+    #   # Can be used to override any common configuration.
+    #   common:
+    #   # Used to define any benchmark specific argument.
+    #   args:
+    #       # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+    #       # before performing the benchmark. This value defaults to 0
+    #       # (The value cannot be 1 because 100% of the nodes cannot be removed).
+    #       removal-rate: 0
+    #       # Defines the order of nodes removal. Valid values for this property are:
+    #       # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+    #       # Note that not all the algorithms support any removal order.
+    #       # For example Jump supports removals only in LIFO order.
+    #       removal-order: lifo
 
     # Benchmarks the time needed by the algorithm to update its internal data structure when the cluster get resized.
     # - name: resize-time
@@ -152,23 +150,23 @@ benchmarks:
     #     removal-order: random   
 
     # Benchmarks the distribution of the keys among the nodes of the cluster.
-    # - name: balance
-    #   # Can be used to override any common configuration.
-    #   common:
-    #   # Used to define any benchmark specific argument.
-    #   args:
-    #     # A number 0 <= x < 1 defining the percentage of initial nodes to remove
-    #     # before performing the benchmark. This value defaults to 0
-    #     # (The value cannot be 1 because 100% of the nodes cannot be removed).
-    #     removal-rate: 0
-    #     # Defines the order of nodes removal. Valid values for this property are:
-    #     # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
-    #     # Note that not all the algorithms support any removal order.
-    #     # For example Jump supports removals only in LIFO order.
-    #     removal-order: random 
-    #     # The benchmark will be executed over a number of keys that is calculated by: keyMultiplier * cluster-nodes.
-    #     # Default value is 100.
-    #     key-multiplier: 1000
+    - name: balance
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      args:
+        # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+        # before performing the benchmark. This value defaults to 0
+        # (The value cannot be 1 because 100% of the nodes cannot be removed).
+        removal-rate: 0
+        # Defines the order of nodes removal. Valid values for this property are:
+        # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+        # Note that not all the algorithms support any removal order.
+        # For example Jump supports removals only in LIFO order.
+        removal-order: random 
+        # The benchmark will be executed over a number of keys that is calculated by: keyMultiplier * cluster-nodes.
+        # Default value is 100.
+        key-multiplier: 1000
   
     # Benchmarks the distribution of the keys among the nodes of the cluster after a resize.
     # - name: resize-balance
