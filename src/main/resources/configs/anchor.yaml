@@ -12,11 +12,11 @@ common:
         # Number of non-recorded iterations of a benchmark. Used to warm up the JVM.
         # The warm-up iterations will not be run for benchmarks that doesn't benefit from it.
         # Default value is 5.
-        warmup: 10
+        warmup: 0
 
         # How many times a single benchmark will be executed.
         # Default value is 5.
-        execution: 10
+        execution: 1
 
     # Configurations that apply only to time based benchmarks.
     time:
@@ -67,13 +67,13 @@ algorithms:
           # The value is multiplied by the number of initial active nodes to find the capacity.
           # E.g., capacity=10 means that the overall capacity of the cluster is 10 times the initial number of working nodes.
           # Default value for the capacity is 10.
-          capacity: 1
+          capacity: 100
     # - name: binomial
             # No arguments
     - name: dx
       args: 
           # Same as above.
-          capacity: 1
+          capacity: 100
     # - name: jump
     #       # No arguments
     - name: memento 
@@ -97,20 +97,20 @@ benchmarks:
     #   args:
 
     # # Benchmarks the time needed to find which node a given key belongs.
-    - name: lookup-time
-      # Can be used to override any common configuration.
-      common:
-      # Used to define any benchmark specific argument.
-      args:
-          # A number 0 <= x < 1 defining the percentage of initial nodes to remove
-          # before performing the benchmark. This value defaults to 0
-          # (The value cannot be 1 because 100% of the nodes cannot be removed).
-          removal-rate: 0
-          # Defines the order of nodes removal. Valid values for this property are:
-          # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
-          # Note that not all the algorithms support any removal order.
-          # For example Jump supports removals only in LIFO order.
-          removal-order: random
+    # - name: lookup-time
+    #   # Can be used to override any common configuration.
+    #   common:
+    #   # Used to define any benchmark specific argument.
+    #   args:
+    #       # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+    #       # before performing the benchmark. This value defaults to 0
+    #       # (The value cannot be 1 because 100% of the nodes cannot be removed).
+    #       removal-rate: 0
+    #       # Defines the order of nodes removal. Valid values for this property are:
+    #       # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+    #       # Note that not all the algorithms support any removal order.
+    #       # For example Jump supports removals only in LIFO order.
+    #       removal-order: random
 
     # Benchmarks the time needed by the algorithm to update its internal data structure when the cluster get resized.
     # - name: resize-time
@@ -129,20 +129,20 @@ benchmarks:
     #       removal-order: random      
 
     # Benchmarks the amount of RAM (in bytes) used by the algorithm.
-    # - name: memory-usage
-    #   # Can be used to override any common configuration.
-    #   common:
-    #   # Used to define any benchmark specific argument.
-    #   args:
-    #     # A number 0 <= x < 1 defining the percentage of initial nodes to remove
-    #     # before performing the benchmark. This value defaults to 0
-    #     # (The value cannot be 1 because 100% of the nodes cannot be removed).
-    #     removal-rate: 0.9
-    #     # Defines the order of nodes removal. Valid values for this property are:
-    #     # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
-    #     # Note that not all the algorithms support any removal order.
-    #     # For example Jump supports removals only in LIFO order.
-    #     removal-order: random   
+    - name: memory-usage
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      args:
+        # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+        # before performing the benchmark. This value defaults to 0
+        # (The value cannot be 1 because 100% of the nodes cannot be removed).
+        removal-rate: 0.9
+        # Defines the order of nodes removal. Valid values for this property are:
+        # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+        # Note that not all the algorithms support any removal order.
+        # For example Jump supports removals only in LIFO order.
+        removal-order: random   
 
     # Benchmarks the distribution of the keys among the nodes of the cluster.
     # - name: balance

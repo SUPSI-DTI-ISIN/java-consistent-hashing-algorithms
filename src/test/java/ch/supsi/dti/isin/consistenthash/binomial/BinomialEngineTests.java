@@ -21,7 +21,8 @@ import org.junit.jupiter.api.Test;
 import ch.supsi.dti.isin.Contract;
 import ch.supsi.dti.isin.consistenthash.BucketBasedEngine;
 import ch.supsi.dti.isin.consistenthash.ConsistentHash;
-import ch.supsi.dti.isin.consistenthash.power.PowerEngine;
+import ch.supsi.dti.isin.key.Distribution;
+import ch.supsi.dti.isin.key.KeyGenerator;
 
 /**
  * Test suite for the class {@link BinomialEngine}.
@@ -77,43 +78,53 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
         final BinomialEngine engine = sampleValue( size );
         assertEquals(size, engine.size());
 
-        int m = Integer.highestOneBit( size );
-        if( size > m )
-            m = m << 1;
-
-        assertEquals( m, engine.m() );
+        int expectedSmallCapacity = Integer.highestOneBit( size ) - 1;
+        assertEquals( expectedSmallCapacity, engine.lowerTreeFilter() );
+        assertEquals( (expectedSmallCapacity << 1) | 1, engine.upperTreeFilter() );
 
     }
 
     @Test
-    public void adding_a_new_bucket_when_size_lt_m_should_increase_the_size_but_not_m()
+    public void adding_a_new_bucket_when_size_lt_upperTreeFilter_should_increase_the_size_but_not_upperTreeFilter()
     {
 
         int size = random.nextInt( 100 ) + 1;
-        final int m = Integer.highestOneBit( size ) << 1;
-        if( size == m )
+        final int lowerTreeFilter = Integer.highestOneBit( size ) - 1;
+        final int upperTreeFilter = (lowerTreeFilter << 1) | 1;
+        if( size == upperTreeFilter )
             size += 1;
         
         final BinomialEngine engine = sampleValue( size );
         engine.addBucket();
 
         assertEquals( size + 1, engine.size() );
-        assertEquals( m, engine.m() );
+
+        final int expectedSmallCapacity = Integer.highestOneBit( size ) - 1;
+        assertEquals( expectedSmallCapacity, engine.lowerTreeFilter() );
+
+        final int expectedTreeCapacity  = (expectedSmallCapacity << 1) | 1;
+        assertEquals( expectedTreeCapacity, engine.upperTreeFilter() );
 
     }
 
     @Test
-    public void adding_a_new_bucket_when_size_eq_m_should_increase_both_the_size_and_m()
+    public void adding_a_new_bucket_when_size_eq_upperTreeFilter_should_increase_both_the_size_and_upperTreeFilter()
     {
 
         int size = random.nextInt( 100 ) + 1;
-        size = Integer.highestOneBit( size );
+        size = Integer.highestOneBit( size ) - 1;
         
         final BinomialEngine engine = sampleValue( size );
+        assertEquals( size, engine.size() );
+        assertEquals( size, engine.upperTreeFilter() );
+
         engine.addBucket();
 
         assertEquals( size + 1, engine.size() );
-        assertEquals( size << 1, engine.m() );
+        assertEquals( size, engine.lowerTreeFilter() );
+
+        final int expectedTreeCapacity = (size << 1) | 1;
+        assertEquals( expectedTreeCapacity, engine.upperTreeFilter() );
 
     }
 
@@ -130,41 +141,41 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
     }
 
     @Test
-    public void removing_a_bucket_when_size_gt_m2_plus_1_should_decrease_the_size_but_not_m()
+    public void removing_a_bucket_when_size_gt_lowerTreeFilter_plus_1_should_decrease_the_size_but_not_the_capacity()
     {
 
-        // int size = random.nextInt( 100 ) + 1;
-        int size = 64;
-        int m = Integer.highestOneBit( size );
-        if( size == m )
+        int size = random.nextInt( 100 ) + 4;
+        final int expectedSmallCapacity = Integer.highestOneBit( size ) - 1;
+        final int expectedTreeCapacity = (expectedSmallCapacity << 1) | 1;
+        if( size == expectedSmallCapacity )
             size += 1;
-        
-        m = m << 1;
 
         final BinomialEngine engine = sampleValue( size + 1 );
+        assertEquals( size + 1, engine.size() );
+        assertEquals( expectedTreeCapacity, engine.upperTreeFilter() );
+        assertEquals( expectedSmallCapacity, engine.lowerTreeFilter() );
+
         engine.removeBucket( 0 );
 
         assertEquals( size, engine.size() );
-        assertEquals( m, engine.m() );
-        assertEquals( m-1, engine.m1() );
-        assertEquals( (m>>1)-1, engine.m2() );
+        assertEquals( expectedTreeCapacity, engine.upperTreeFilter() );
+        assertEquals( expectedSmallCapacity, engine.lowerTreeFilter() );
 
     }
 
     @Test
-    public void removing_a_bucket_when_size_eq_m2_plus_1_should_decrease_both_the_size_and_m()
+    public void removing_a_bucket_when_size_eq_upperTreeFilter_plus_1_should_decrease_both_size_and_upperTreeFilter()
     {
 
         int size = random.nextInt( 100 ) + 1;
         size = Integer.highestOneBit( size );
         
-        final BinomialEngine engine = sampleValue( size + 1 );
+        final BinomialEngine engine = sampleValue( size );
 
         engine.removeBucket( 0 );
-        assertEquals( size, engine.size() );
-        assertEquals( size, engine.m() );
-        assertEquals( size-1, engine.m1() );
-        assertEquals( (size>>1)-1, engine.m2() );
+        assertEquals( size-1, engine.size() );
+        assertEquals( size-1, engine.upperTreeFilter() );
+        assertEquals( (size-1)>>1, engine.lowerTreeFilter() );
 
     }
 
@@ -250,14 +261,14 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
     public void test_balance()
     {
 
-        final int size = 12;
+        final int size = 10;
         final int h = Integer.highestOneBit( size );
-        final int m = size == h ? h : h << 1;
+        final int m = size > h ? h << 1 : h;
         final List<List<String>> lists = new ArrayList<>( m );
         for( int i = 0; i < m; ++i )
             lists.add( new ArrayList<>() );
 
-        final BinomialEngine engine = new BinomialEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
+        final BucketBasedEngine engine = new BinomialEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
         // final JumpEngine engine = new JumpEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
         // final PowerEngine engine = new PowerEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
 
@@ -289,14 +300,14 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
     public void test_distribution()
     {
 
-        final int size = 13;
+        final int size = 9;
         final int h = Integer.highestOneBit( size );
         final int m = size == h ? h : h << 1;
         final List<List<String>> lists = new ArrayList<>( m );
         for( int i = 0; i < m; ++i )
             lists.add( new ArrayList<>() );
 
-        final BucketBasedEngine engine = new PowerEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
+        final BucketBasedEngine engine = new BinomialEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
 
         // final int keys = size * 1000;
         final int keys = 150;
@@ -318,7 +329,7 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
     public void test_monotonicity()
     {
 
-        final int fromSize = 12;
+        final int fromSize = 8;
         final int toSize = fromSize + 1;
         final int keys = 200000;
 

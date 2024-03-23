@@ -267,34 +267,34 @@ public class PowerEngine implements BucketBasedEngine
 
     }
 
-    /**
-     * The function {@code g} as described in the paper.
-     * 
-     * @param hash   the hash of the key.
-     * @param random the pseudo-random generator to use.
-     * @return the intermediate bucket.
-     */
-    private int k( long hash )
-    {
+    // /**
+    //  * The function {@code g} as described in the paper.
+    //  * 
+    //  * @param hash   the hash of the key.
+    //  * @param random the pseudo-random generator to use.
+    //  * @return the intermediate bucket.
+    //  */
+    // private int k( long hash )
+    // {
 
-        LinearCongruentialGenerator generator = new LinearCongruentialGenerator( hash );
+    //     LinearCongruentialGenerator generator = new LinearCongruentialGenerator( hash );
 
-        final int hm = m >> 1;
-        final int limit = size - hm;
-        int candidate = 0;
-        int next;
+    //     final int hm = m >> 1;
+    //     final int limit = size - hm;
+    //     int candidate = 0;
+    //     int next;
 
-        // Jump from bucket to bucket until we go out of range
-        while( true ){
-            next = (int) ((candidate + 1) / generator.nextDouble());
-            if (next >= 0 && next < limit) {
-                candidate = next;
-            } else {
-                return candidate + hm;
-            }
-        }
+    //     // Jump from bucket to bucket until we go out of range
+    //     while( true ){
+    //         next = (int) ((candidate + 1) / generator.nextDouble());
+    //         if (next >= 0 && next < limit) {
+    //             candidate = next;
+    //         } else {
+    //             return candidate + hm;
+    //         }
+    //     }
 
-    }
+    // }
 
     // /**
     //  * The function {@code g} as described in the paper.

@@ -1,4 +1,4 @@
-package ch.supsi.dti.isin.consistenthash.binomial;
+package ch.supsi.dti.isin.consistenthash.binomial1;
 
 import ch.supsi.dti.isin.consistenthash.BucketBasedEngine;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
@@ -15,7 +15,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
  *
  * @author Massimo Coluzzi
  */
-public class BinomialEngine implements BucketBasedEngine
+public class Binomial1Engine implements BucketBasedEngine
 {
 
 
@@ -46,7 +46,7 @@ public class BinomialEngine implements BucketBasedEngine
      * @param size         the number of working nodes
      * @param hashFunction the hash function to use
      */
-    public BinomialEngine( int size, HashFunction hashFunction )
+    public Binomial1Engine( int size, HashFunction hashFunction )
     {
 
         super();
@@ -70,26 +70,10 @@ public class BinomialEngine implements BucketBasedEngine
 
 
     /**
-     * Linear congruential generator to create uniformly
-     * distributed values.
-     * 
-     * @param value the value to rehash
-     * @param seed the seed to use
-     * @return the rehashed value
-     */
-    public long rehash( long value, int seed )
-    {
-        
-        final long hash = 2862933555777941757L * value + 1;
-        return (hash * hash * seed) >>> 32;
-
-    }
-
-    /**
      * Returns a random position iside the same tree level of the provided bucket.
      * 
+     * @param hash
      * @param bucket the bucket to relocate
-     * @param hash   the hash of the key mapped to the bucket
      * @return a random position inside the same tree level
      */
     public int relocateInsideLevel( int bucket, long hash )
@@ -103,12 +87,11 @@ public class BinomialEngine implements BucketBasedEngine
             return bucket;
 
         final int levelBaseIndex = Integer.highestOneBit( bucket );
-        final int levelFilter = levelBaseIndex - 1;
+        final long newHash = hashFunction.hash( hash, levelBaseIndex );
+        final int h = (int) newHash & (levelBaseIndex - 1);
 
-        final long levelHash = rehash( hash, levelFilter );
-        final int levelIndex = (int) levelHash & levelFilter;
-
-        return levelBaseIndex + levelIndex;
+        final int r = levelBaseIndex + h;
+        return r;
 
     }
 
@@ -127,14 +110,12 @@ public class BinomialEngine implements BucketBasedEngine
     public int getBucket( String key )
     {
 
-        /* If the cluster counts only one node we return such a node. */
-        if( size < 2 )
+        if( size <= 1 )
             return 0;
 
-        /* We get the hash of the provided key. */
         final long hash = hashFunction.hash( key );
         
-        /* We get a position within the upper tree based on the value of the key hash. */
+        /* We get a random position within the upper tree. */
         int bucket = (int) hash & upperTreeFilter;
 
         /* We relocate the bucket randomly inside the same tree level. */
@@ -146,16 +127,15 @@ public class BinomialEngine implements BucketBasedEngine
 
         /*
          * Otherwise, we get a new random position in the upper tree
-         * and return it if in the range [lowerTreeFilter+1,size-1].
-         * We repeat the operation twice (if needed) to get a better balance.
+         * and return it if in the range {@code [lowerTreeFilter+1,size-1]}.
+         * We repeat the operation twice if needed to get a better balance.
          */
-        long h = hash;
+        long rehash = hash;
         for( int i = 0; i < 2; ++i )
         {
 
-            h = rehash( h, upperTreeFilter );
-            bucket = (int) h & upperTreeFilter;
-            
+            rehash = hashFunction.hash( rehash, upperTreeFilter );
+            bucket = (int) rehash & upperTreeFilter;
             if( bucket > lowerTreeFilter && bucket < size )
                 return bucket;
 
@@ -170,6 +150,8 @@ public class BinomialEngine implements BucketBasedEngine
         return relocateInsideLevel( bucket, hash );
 
     }
+
+
 
     /**
      * Increases the cluster size by one.
