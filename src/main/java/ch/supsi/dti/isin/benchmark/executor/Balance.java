@@ -9,9 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
-
-import org.nerd4j.utils.tuple.ComparablePair;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
 import ch.supsi.dti.isin.benchmark.config.BenchmarkConfig;
@@ -255,16 +252,6 @@ public class Balance extends BenchmarkExecutor
 
             final long end = System.currentTimeMillis();
             final long time = end - start;
-
-            System.out.println();
-            metrics.counts.get(0).entrySet().stream()
-                .sorted( (a,b) -> {
-                    Integer x = Integer.valueOf( a.getKey().name().substring(5) );
-                    Integer y = Integer.valueOf( b.getKey().name().substring(5) );
-
-                    return x.compareTo( y );
-                })
-                .forEach( e -> System.out.println( e.getKey().name().substring(5) + ": " + e.getValue() ));
 
             System.out.println("-> [" + metrics.getMinCount(i + 1) + ","
                     + metrics.getMaxCount(i + 1) + "] in " + time + "ms");
