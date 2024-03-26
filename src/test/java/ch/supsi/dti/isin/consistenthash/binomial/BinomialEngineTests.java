@@ -4,9 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,10 +16,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import ch.supsi.dti.isin.Contract;
-import ch.supsi.dti.isin.consistenthash.BucketBasedEngine;
 import ch.supsi.dti.isin.consistenthash.ConsistentHash;
-import ch.supsi.dti.isin.key.Distribution;
-import ch.supsi.dti.isin.key.KeyGenerator;
 
 /**
  * Test suite for the class {@link BinomialEngine}.
@@ -226,168 +220,6 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
             assertTrue( count.get() > 0 );
         });
         
-    }
-
-    @Test
-    public void test_case()
-    {
-
-        // final String key = "010.401033";
-        // final String key = "010.3050040025";
-        // final String key = "010.207522010801";
-        // final String key = "010.30806465063046";
-        final String key = "010.50777305250515";
-        final BinomialEngine engine = new BinomialEngine( 16, ConsistentHash.DEFAULT_HASH_FUNCTION );  
-        // final PowerEngine engine = new PowerEngine( 16, ConsistentHash.DEFAULT_HASH_FUNCTION );  
-        // final JumpEngine engine = new JumpEngine( 16, ConsistentHash.DEFAULT_HASH_FUNCTION );  
-        
-        for( int i = 15; i > 0; --i )
-        {
-            System.out.println( engine.size() + " -> " + engine.getBucket(key) );
-            engine.removeBucket( i );
-
-        }
-        
-        for( int i = 15; i > 0; --i )
-        {
-            System.out.println( engine.size() + " -> " + engine.getBucket(key) );
-            engine.addBucket();
-
-        }
-        
-    }
-
-    @Test
-    public void test_balance()
-    {
-
-        final int size = 10;
-        final int h = Integer.highestOneBit( size );
-        final int m = size > h ? h << 1 : h;
-        final List<List<String>> lists = new ArrayList<>( m );
-        for( int i = 0; i < m; ++i )
-            lists.add( new ArrayList<>() );
-
-        final BucketBasedEngine engine = new BinomialEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
-        // final JumpEngine engine = new JumpEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
-        // final PowerEngine engine = new PowerEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
-
-        // final int keys = m * 1000;
-        final int keys = size * 1000;
-        for( int i = 0; i < keys; ++i )
-        {
-            final String key = String.valueOf( i );
-            final int bucket = engine.getBucket( key );
-            lists.get( bucket ).add( key );
-        }
-
-        int sum = 0;
-        float perc = 0;
-        for( int i = 0; i < m; ++ i )
-        {
-            final int k = lists.get(i).size();
-            final float p = (float) k / keys;
-            final float g = p * 100;
-            System.out.printf( "%d: %d %.1f%%\n", i, k, g ); 
-            sum += k;
-            perc += g;
-        }
-        System.out.printf( "tot: %d, %.1f%%", sum, perc );
-
-    }
-
-    @Test
-    public void test_distribution()
-    {
-
-        final int size = 9;
-        final int h = Integer.highestOneBit( size );
-        final int m = size == h ? h : h << 1;
-        final List<List<String>> lists = new ArrayList<>( m );
-        for( int i = 0; i < m; ++i )
-            lists.add( new ArrayList<>() );
-
-        final BucketBasedEngine engine = new BinomialEngine( size, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
-
-        // final int keys = size * 1000;
-        final int keys = 150;
-        for( int i = 0; i < keys; ++i )
-        {
-            final String key = String.valueOf( i );
-            final int bucket = engine.getBucket( key );
-            lists.get( bucket ).add( key );
-        }
-
-        for( int i = 0; i < m; ++ i )
-        {
-            System.out.printf( "%d: %s\n", i, lists.get(i) ); 
-        }
-
-    }
-
-    @Test
-    public void test_monotonicity()
-    {
-
-        final int fromSize = 8;
-        final int toSize = fromSize + 1;
-        final int keys = 200000;
-
-        final BucketBasedEngine fromEngine = new BinomialEngine( fromSize, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
-        // final BucketBasedEngine fromEngine = new PowerEngine( fromSize, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
-        final Map<Integer,Integer> fromMapping = getKeyMapping( fromEngine, keys );
-        
-        final BucketBasedEngine toEngine = new BinomialEngine( toSize, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
-        // final BucketBasedEngine toEngine = new PowerEngine( toSize, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
-        final Map<Integer,Integer> toMapping = getKeyMapping( toEngine, keys );
-
-        final List<List<Integer>> lists = new ArrayList<>( toSize );
-        for( int i = 0; i < toSize; ++i )
-            lists.add( new ArrayList<>() );
-            
-        for( int i = 0; i < keys; ++i )
-        {
-            final int from = fromMapping.get( i );
-            final int to   = toMapping.get( i );
-
-            if( from != to )
-                lists.get( to ).add( i );
-        }
-
-        int movedWrong = 0;
-        for( int i = 0; i < fromSize; ++i )
-        {
-            int m = lists.get( i ).size();
-            System.out.printf( "%d: %d\n", i, m );
-            movedWrong += m;
-        }
-
-        int movedRight = 0;
-        for( int i = fromSize; i < toSize; ++i )
-        {
-            int m = lists.get( i ).size();
-            System.out.printf( "%d: %d\n", i, m );
-            movedRight += m;
-        }
-        System.out.printf("Moved right: %d %.3f (%.3f)\n", movedRight, (float) movedRight * 100 / keys, 100f/toSize);
-        System.out.printf("Moved wrong: %d %.3f (%.3f)\n", movedWrong, (float) movedWrong * 100 / keys, 100f/toSize);
-        
-        
-    }
-
-    public Map<Integer,Integer> getKeyMapping( BucketBasedEngine engine, int keys )
-    {
-
-        final Map<Integer,Integer> map = new HashMap<>( keys );
-        for( int i = 0; i < keys; ++i )
-        {
-            final String key = String.valueOf( i );
-            final int bucket = engine.getBucket( key );
-            map.put( i, bucket );
-        }
-
-        return map;
-
     }
 
 }
