@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import ch.supsi.dti.isin.benchmark.adapter.consistenthash.anchor.AnchorFactory;
 import ch.supsi.dti.isin.benchmark.adapter.consistenthash.dx.DxFactory;
 import ch.supsi.dti.isin.benchmark.adapter.consistenthash.jump.JumpFactory;
+import ch.supsi.dti.isin.benchmark.adapter.consistenthash.jumpback.JumpBackFactory;
 import ch.supsi.dti.isin.benchmark.adapter.consistenthash.maglev.MaglevFactory;
 import ch.supsi.dti.isin.benchmark.adapter.consistenthash.multiprobe.MultiProbeFactory;
 import ch.supsi.dti.isin.benchmark.adapter.consistenthash.rendezvous.RendezvousFactory;
@@ -49,6 +50,7 @@ public class ConsistentHashFactoryLoaderTests
         expected.put( "multiprobe", MultiProbeFactory.class );
         expected.put( "rendezvous", RendezvousFactory.class );
         expected.put( "ring", RingFactory.class );
+        expected.put( "jumpback", JumpBackFactory.class );
         
         final ConsistentHashFactoryLoader loader = ConsistentHashFactoryLoader.getInstance();
         for( Map.Entry<String,Class<? extends ConsistentHashFactory>> entry : expected.entrySet() )

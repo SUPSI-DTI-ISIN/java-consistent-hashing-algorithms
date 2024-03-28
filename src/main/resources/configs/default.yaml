@@ -24,6 +24,7 @@ algorithms:
     - name: power
     - name: rendezvous
     - name: ring
+    - name: jumpback
 
 benchmarks: 
     - name: init-time

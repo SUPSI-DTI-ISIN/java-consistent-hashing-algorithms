@@ -21,6 +21,7 @@ import ch.supsi.dti.isin.consistenthash.ConsistentHash.Algorithm;
 import ch.supsi.dti.isin.consistenthash.anchor.AnchorHash;
 import ch.supsi.dti.isin.consistenthash.dx.DxHash;
 import ch.supsi.dti.isin.consistenthash.jump.JumpHash;
+import ch.supsi.dti.isin.consistenthash.jumpback.JumpBackHash;
 import ch.supsi.dti.isin.consistenthash.maglev.MaglevHash;
 import ch.supsi.dti.isin.consistenthash.multiprobe.MultiProbeHash;
 import ch.supsi.dti.isin.consistenthash.rendezvous.RendezvousHash;
@@ -67,6 +68,7 @@ public class ConsistentHashTests
         map.put( Algorithm.MULTIPROBE_HASH, MultiProbeHash.class );
         map.put( Algorithm.RENDEZVOUS_HASH, RendezvousHash.class );
         map.put( Algorithm.RING_HASH, RingHash.class );
+        map.put( Algorithm.JUMP_BACK_HASH, JumpBackHash.class );
 
         map.forEach( (algorithm, expected) ->
         {
