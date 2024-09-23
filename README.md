@@ -11,6 +11,7 @@ The implemented algorithms are:
 * [2020] __anchor hash__ by [Gal Mendelson et al.](https://arxiv.org/pdf/1812.09674.pdf)
 * [2021] __dx hash__ by [Chaos Dong and Fang Wang](https://arxiv.org/pdf/2107.07930.pdf)
 * [2023] __memento hash__ by [M. Coluzzi et al.](https://arxiv.org/pdf/2306.09783.pdf)
+* [2024] __jumpback hash__ by [Otmar Ertl](https://arxiv.org/abs/2403.18682)
 * [2024] __binomial hash__ by [M. Coluzzi et al.](https://arxiv.org/pdf/2406.19836.pdf)
 
 

@@ -10,6 +10,7 @@ import ch.supsi.dti.isin.cluster.Node;
 import ch.supsi.dti.isin.consistenthash.anchor.AnchorHash;
 import ch.supsi.dti.isin.consistenthash.dx.DxHash;
 import ch.supsi.dti.isin.consistenthash.jump.JumpHash;
+import ch.supsi.dti.isin.consistenthash.jumpback.JumpBackHash;
 import ch.supsi.dti.isin.consistenthash.maglev.MaglevHash;
 import ch.supsi.dti.isin.consistenthash.multiprobe.MultiProbeHash;
 import ch.supsi.dti.isin.consistenthash.rendezvous.RendezvousHash;
@@ -121,6 +122,8 @@ public interface ConsistentHash
             
             case RING_HASH: return new RingHash( nodes, hash );
 
+            case JUMP_BACK_HASH: return new JumpBackHash( nodes, hash );
+
             default:
                 throw new IllegalArgumentException( "Unknown algorithm " + algorithm );
 
@@ -161,7 +164,10 @@ public interface ConsistentHash
         RENDEZVOUS_HASH,
 
         /** {@code https://www.cs.princeton.edu/courses/archive/fall09/cos518/papers/chash.pdf} */
-        RING_HASH;
+        RING_HASH,
+
+        /** {@code https://github.com/dynatrace-oss/hash4j/blob/v0.17.0/src/main/java/com/dynatrace/hash4j/consistent/ConsistentJumpBackBucketHasher.java} */
+        JUMP_BACK_HASH;
 
     }
 

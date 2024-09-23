@@ -38,6 +38,7 @@ algorithms:
     args:
         virtual-nodes: 1000
 -   name: Jump
+-   name: JumpBack
 
 benchmarks: 
 -   name: BenchmarkInit
