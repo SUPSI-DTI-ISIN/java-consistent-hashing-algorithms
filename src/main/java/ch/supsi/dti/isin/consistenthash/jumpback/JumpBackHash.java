@@ -137,10 +137,11 @@ public class JumpBackHash implements ConsistentHash
     /**
      * {@inheritDoc}}
      */
-    public boolean supportsRandomRemovals()
+    @Override
+    public boolean supportsOnlyLifoRemovals()
     {
 
-        return false;
+        return true;
 
     }
 

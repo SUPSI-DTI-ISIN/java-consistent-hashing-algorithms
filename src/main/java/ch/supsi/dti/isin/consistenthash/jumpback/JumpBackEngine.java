@@ -2,6 +2,7 @@ package ch.supsi.dti.isin.consistenthash.jumpback;
 
 import ch.supsi.dti.isin.consistenthash.BucketBasedEngine;
 import ch.supsi.dti.isin.hashfunction.HashFunction;
+
 import com.dynatrace.hash4j.consistent.ConsistentBucketHasher;
 import com.dynatrace.hash4j.consistent.ConsistentHashing;
 import com.dynatrace.hash4j.random.PseudoRandomGeneratorProvider;
@@ -25,6 +26,7 @@ public class JumpBackEngine implements BucketBasedEngine
     /** Hashing function to use. */
     private final HashFunction hashFunction;
 
+    /** A hash function that maps a given hash consistently to a bucket index of given range. */
     private final ConsistentBucketHasher consistentBucketHasher;
 
 

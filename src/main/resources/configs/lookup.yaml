@@ -77,6 +77,8 @@ algorithms:
     #       capacity: 10
     - name: jump
     #       # No arguments
+    - name: jumpback
+          # No arguments
     - name: memento
     #       # No arguments
     - name: power

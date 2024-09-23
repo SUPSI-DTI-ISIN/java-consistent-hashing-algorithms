@@ -82,6 +82,8 @@ algorithms:
           capacity: 10
     - name: jump
           # No arguments
+    - name: jumpback
+          # No arguments
     - name: maglev
       args:
           # Number of entries per node in the lookup table.
@@ -106,8 +108,6 @@ algorithms:
           # Number of virtual nodes per physical node.
           # Default value is 1000
           virtualNodes: 1000
-    - name: jumpback
-      # No arguments
 
 
 # Lists the benchmarks to be executed.
