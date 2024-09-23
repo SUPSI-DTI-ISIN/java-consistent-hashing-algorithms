@@ -27,7 +27,7 @@ public interface ConsistentHash
 {
 
     /** The {@link HashFunction.Algorithm} to be used by default in consistent hash algorithms. */
-    public static final HashFunction.Algorithm DEFAULT_HASH_ALGOTITHM = HashFunction.Algorithm.MURMUR3;
+    public static final HashFunction.Algorithm DEFAULT_HASH_ALGOTITHM = HashFunction.Algorithm.XX;
 
     /** The {@link HashFunction} to be used by default in consistent hash algorithms. */
     public static final HashFunction DEFAULT_HASH_FUNCTION = HashFunction.create( DEFAULT_HASH_ALGOTITHM );
@@ -56,11 +56,11 @@ public interface ConsistentHash
     void removeNodes( Collection<? extends Node> nodes );
 
     /**
-     * Tells if the algorithm supports the removal of random nodes.
+     * Tells if the algorithm supports only removals in LIFO order.
      * 
-     * @return {@code true} if nodes can be removed randomly
+     * @return {@code true} if nodes can be removed only in LIFO order.
      */
-    boolean supportsRandomRemovals();
+    boolean supportsOnlyLifoRemovals();
 
     /**
      * Returns the number of nodes in the cluster.

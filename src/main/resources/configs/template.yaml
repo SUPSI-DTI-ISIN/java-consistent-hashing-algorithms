@@ -125,15 +125,15 @@ benchmarks:
       common:
       # Used to define any benchmark specific argument.
       args:
-          # A number 0 <= x < 1 defining the percentage of initial nodes to remove
-          # before performing the benchmark. This value defaults to 0
-          # (The value cannot be 1 because 100% of the nodes cannot be removed).
-          removal-rate: 0
-          # Defines the order of nodes removal. Valid values for this property are:
-          # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
-          # Note that not all the algorithms support any removal order.
-          # For example Jump supports removals only in LIFO order.
-          removal-order: lifo
+        # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+        # before performing the benchmark. This value defaults to 0
+        # (The value cannot be 1 because 100% of the nodes cannot be removed).
+        removal-rate: 0
+        # Defines the order of nodes removal. Valid values for this property are:
+        # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+        # Note that not all the algorithms support any removal order.
+        # For example Jump supports removals only in LIFO order.
+        removal-order: lifo
 
     # Benchmarks the time needed by the algorithm to update its internal data structure when the cluster get resized.
     - name: resize-time
@@ -141,6 +141,15 @@ benchmarks:
       common:
       # Used to define any benchmark specific argument.
       args:
+        # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+        # before performing the benchmark. This value defaults to 0
+        # (The value cannot be 1 because 100% of the nodes cannot be removed).
+        removal-rate: 0
+        # Defines the order of nodes removal. Valid values for this property are:
+        # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+        # Note that not all the algorithms support any removal order.
+        # For example Jump supports removals only in LIFO order.
+        removal-order: lifo
 
     # Benchmarks the amount of RAM (in bytes) used by the algorithm.
     - name: memory-usage
@@ -148,6 +157,16 @@ benchmarks:
       common:
       # Used to define any benchmark specific argument.
       args:
+        # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+        # before performing the benchmark. This value defaults to 0
+        # (The value cannot be 1 because 100% of the nodes cannot be removed).
+        removal-rate: 0
+        # Defines the order of nodes removal. Valid values for this property are:
+        # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+        # Note that not all the algorithms support any removal order.
+        # For example Jump supports removals only in LIFO order.
+        removal-order: lifo
+
 
     # Benchmarks the distribution of the keys among the nodes of the cluster.
     - name: balance
@@ -155,6 +174,15 @@ benchmarks:
       common:
       # Used to define any benchmark specific argument.
       args:
+        # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+        # before performing the benchmark. This value defaults to 0
+        # (The value cannot be 1 because 100% of the nodes cannot be removed).
+        removal-rate: 0
+        # Defines the order of nodes removal. Valid values for this property are:
+        # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+        # Note that not all the algorithms support any removal order.
+        # For example Jump supports removals only in LIFO order.
+        removal-order: lifo
         # The benchmark will be executed over a number of keys that is calculated by: keyMultiplier * cluster-nodes.
         # Default value is 100.
         key-multiplier: 100
@@ -175,11 +203,54 @@ benchmarks:
       common:
       # Used to define any benchmark specific argument.
       args:
-          # Percentage of nodes to remove. The provided value must be >= 0 and < 1).
-          # At least one value must be provided.
-          # The benchmark will run for every specified value.
-          fractions: [0.1, 0.3, 0.5]
+        # A number 0 <= x < 1 defining the percentage of initial nodes to remove
+        # before performing the benchmark. This value defaults to 0
+        # (The value cannot be 1 because 100% of the nodes cannot be removed).
+        removal-rate: 0
+        # Defines the order of nodes removal. Valid values for this property are:
+        # FIFO, LIFO, and RANDOM. This value defaults to LIFO.
+        # Note that not all the algorithms support any removal order.
+        # For example Jump supports removals only in LIFO order.
+        removal-order: lifo
+        # See keyMultiplier on BenchmarkBalance.
+        # Default value is 100.
+        key-multiplier: 100
+        # Percentage of nodes to remove. The provided value must be >= 0 and < 1).
+        # At least one value must be provided.
+        # The benchmark will run for every specified value.
+        fractions: [0.1, 0.3, 0.5]
 
-          # See keyMultiplier on BenchmarkBalance.
-          # Default value is 100.
-          keyMultiplier: 100
+        # Benchmarks the time needed to find which node a given key belongs.
+    # This version keeps the cluster size fixed and incrementally removes the nodes.
+    - name: incremental-lookup-time
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      # This benchmark should overwrite the common init-nodes
+      # property with a fixed value.
+        init-nodes: [1000]
+      args:
+        # Represents the persentage of nodes to remove.
+        # Every value in the list must be a number 0 <= x < 1
+        # defining the percentage of initial nodes to remove
+        # before performing the benchmark.
+        # This value defaults to [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+        # representing an incremental removal from 0% to 90% of the initial nodes.
+        removal-rates: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+    # Benchmarks the amount of RAM (in bytes) used by the algorithm.
+    # This version keeps the cluster size fixed and incrementally removes the nodes.
+    - name: incremental-memory-usage
+      # Can be used to override any common configuration.
+      common:
+      # Used to define any benchmark specific argument.
+      # property with a fixed value.
+        init-nodes: [1000]
+      args:
+        # Represents the persentage of nodes to remove.
+        # Every value in the list must be a number 0 <= x < 1
+        # defining the percentage of initial nodes to remove
+        # before performing the benchmark.
+        # This value defaults to [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+        # representing an incremental removal from 0% to 90% of the initial nodes.
+        removal-rates: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]

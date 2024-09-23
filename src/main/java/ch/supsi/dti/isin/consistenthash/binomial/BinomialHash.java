@@ -1,4 +1,4 @@
-package ch.supsi.dti.isin.consistenthash.dx;
+package ch.supsi.dti.isin.consistenthash.binomial;
 
 import java.util.Collection;
 
@@ -11,21 +11,22 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
 
 
 /**
- * Wrapper to adapt the {@link DxEngine} to the {@link ConsistentHash} interface.
+ * Wrapper to adapt the {@link BinomialEngine} to the {@link ConsistentHash} interface.
  * 
  * This wrapper performs all the consistency checks.
  *
  *
  * @author Massimo Coluzzi
  */
-public class DxHash implements ConsistentHash
+public class BinomialHash implements ConsistentHash
 {
 
+
     /**
-     * The {@code DxHash} algorithm engine as described in:
-     * {@code https://arxiv.org/pdf/2107.07930.pdf}
+     * The {@code BinomialHash} algorithm engine as described in:
+     * {@code N/A}
      */
-    private final DxEngine engine;
+    private final BinomialEngine engine;
 
     /** One-to-one mapping between a node and the related bucket. */
     private final Indirection indirection;
@@ -33,45 +34,45 @@ public class DxHash implements ConsistentHash
 
     /**
      * Constructor with parameters.
-     *
-     * @param nodes    initial cluster nodes
-     * @param capacity overall capacity of the cluster (max number of nodes)
+     * 
+     * @param nodes initial cluster nodes
      */
-    public DxHash( Collection<? extends Node> nodes, int capacity )
+    public BinomialHash( Collection<? extends Node> nodes )
     {
 
-        this( nodes, capacity, DEFAULT_HASH_FUNCTION );
+        this( nodes, DEFAULT_HASH_FUNCTION );
 
     }
 
     /**
      * Constructor with parameters.
-     *
-     * @param nodes        initial cluster nodes
-     * @param capacity     overall capacity of the cluster (max number of nodes)
+     * 
+     * @param initNodes    initial cluster nodes
      * @param hashFunction the hash function to use
      */
-    public DxHash( Collection<? extends Node> nodes, int capacity, HashFunction hashFunction )
+    public BinomialHash( Collection<? extends Node> initNodes, HashFunction hashFunction )
     {
 
         super();
 
-        Require.nonEmpty( nodes, "The cluster must have at least one node" );
-        Require.toHold( nodes.size() <= capacity, "The cluster overall capacity cannot be smaller than the number of working nodes" );
+        final int size = Require.nonEmpty( initNodes, "The cluster must have at least one node" ).size();
         
-        this.engine = new DxEngine(
-            0, capacity, Require.nonNull( hashFunction, "The hash function to use cannot be null" )
-        );
+        this.indirection = new Indirection( size );
 
-        this.indirection = new Indirection( nodes.size() );
-        
-        for ( Node node : nodes )
+        for( Node node : initNodes )
         {
             
-            final int bucket = engine.addBucket();
+            Require.nonNull( node, "The resource to add cannot be null" );
+
+            final int bucket = indirection.size();
             indirection.put( node, bucket );
 
         }
+
+        this.engine = new BinomialEngine(
+            size,
+            Require.nonNull( hashFunction, "The hash function to use is mandatory" )
+        );
 
     }
 
@@ -88,11 +89,12 @@ public class DxHash implements ConsistentHash
     public Node getNode( String key )
     {
 
-        Require.nonEmpty( key, "The key to evaluate is mandatory" );
+        final int bucket = engine.getBucket(
+            Require.nonEmpty( key, "The key to evaluate is mandatory" )
+        );
 
-        final int bucket = engine.getBucket( key );
         return indirection.get( bucket );
-
+        
     }
 
     /**
@@ -101,28 +103,18 @@ public class DxHash implements ConsistentHash
     @Override
     public void addNodes( Collection<? extends Node> toAdd )
     {
-
+        
         Require.nonEmpty( toAdd, "The resources to add are mandatory" );
-        Require.toHold( engine.size() + toAdd.size() <= engine.capacity(), "No room for more resources" );
+
         for( Node node : toAdd )
         {
 
-            final int bucket = engine.addBucket();
+            final int bucket = engine.size();
+            this.indirection.put( node, bucket );
+            engine.addBucket();
 
-            try{
-
-                indirection.put( node, bucket );
-
-            }catch( RuntimeException ex )
-            {
-
-                engine.removeBucket( bucket );
-                throw ex;
-                
-            }
-            
         }
-
+        
     }
 
     /**
@@ -137,10 +129,11 @@ public class DxHash implements ConsistentHash
 
         for( Node node : toRemove )
         {
-            
-            final int bucket = indirection.remove( node );
-            engine.removeBucket( bucket );
 
+            final int bucket = indirection.remove( node );
+            Require.toHold( bucket == engine.size() - 1, "Only the last inserted node can be removed" );
+            engine.removeBucket( bucket );
+            
         }
 
     }
@@ -152,7 +145,7 @@ public class DxHash implements ConsistentHash
     public boolean supportsOnlyLifoRemovals()
     {
 
-        return false;
+        return true;
 
     }
 
@@ -160,7 +153,8 @@ public class DxHash implements ConsistentHash
      * {@inheritDoc}
      */
     @Override
-    public int nodeCount() {
+    public int nodeCount()
+    {
 
         return engine.size();
 

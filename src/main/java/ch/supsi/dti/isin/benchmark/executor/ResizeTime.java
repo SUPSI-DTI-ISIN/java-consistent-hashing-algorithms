@@ -69,17 +69,19 @@ public class ResizeTime extends BenchmarkExecutor
 
         final Path file = BenchmarkExecutionUtils.getOutputFile( config );
         
-        final String[] functions = BenchmarkExecutionUtils.getHashFunctionNames( config );
+        final String[] benchmarks = { config.getName() };
+        final String[] functions  = BenchmarkExecutionUtils.getHashFunctionNames( config );
         final String[] algorithms = BenchmarkExecutionUtils.getAlgorithms( factories );
-        final String[] initNodes = BenchmarkExecutionUtils.getInitNodes( config );
+        final String[] initNodes  = BenchmarkExecutionUtils.getInitNodes( config );
 
         final CommonConfig common = config.getCommon();
         final IterationsConfig iterations = common.getIterations();
         final TimeConfig time = common.getTime();
 
         final Options opt = new OptionsBuilder()
-            .include( ResizeTime.ResizeTimeExecutor.class.getSimpleName() )
+            .include( ResizeTime.ResizeTimeExecutor.class.getCanonicalName() )
 
+            .param( "benchmark", benchmarks )
             .param( "function", functions )
             .param( "initNodes", initNodes )
             .param( "algorithm", algorithms )
@@ -133,6 +135,10 @@ public class ResizeTime extends BenchmarkExecutor
     public static class ResizeTimeExecutor<N>
     {
 
+        /** Name of the current benchmark. */
+        @Param({})
+        private String benchmark;
+        
         /** Number of nodes used to initialize the cluster. */
         @Param({})
         private int initNodes;
@@ -164,13 +170,16 @@ public class ResizeTime extends BenchmarkExecutor
         public void setup( JMHConfigWrapper wrapper )
         {
 
+            final BenchmarkConfig benchmarkConfig = BenchmarkExecutionUtils.getBenchmarkConfig( wrapper.getConfig(), benchmark );
             final AlgorithmConfig algorithmConfig = BenchmarkExecutionUtils.getAlgorithmConfig( wrapper.getConfig(), algorithm );
-            final ConsistentHashFactory factory = BenchmarkExecutionUtils.getFactory( algorithmConfig );
 
+            final ConsistentHashFactory factory = BenchmarkExecutionUtils.getFactory( algorithmConfig );
             final HashFunction hashFunction = HashFunctionLoader.getInstance().load( function );
             final List<Node> nodes = SimpleNode.create( initNodes );
 
             final ConsistentHash consistentHash = factory.createConsistentHash( hashFunction, nodes );
+            BenchmarkExecutionUtils.removeNodesIfNeeded( benchmarkConfig, consistentHash, nodes );
+
             final ConsistentHashEnginePilot<?> pilot = factory.createEnginePilot( consistentHash );
             this.pilot = (ConsistentHashEnginePilot<N>) pilot;
 

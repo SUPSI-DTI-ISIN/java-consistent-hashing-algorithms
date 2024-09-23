@@ -18,11 +18,12 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
 /**
  * Benchmark tool to measure the memory usage of a consistent hashing algorithm
  * with different HashFunction and nodes number.
+ * This version of the memory usage benchmark fixes the size of the cluster
+ * and increases the rate of removed nodes.
  * 
  * @author Massimo Coluzzi
- * @author Samuel De Babo Martins
  */
-public class MemoryUsage extends BenchmarkExecutor
+public class IncrementalMemoryUsage extends BenchmarkExecutor
 {
 
     /**
@@ -30,7 +31,7 @@ public class MemoryUsage extends BenchmarkExecutor
      *
      * @param config  configuration to use to setup the current benchmark
      */
-    public MemoryUsage( BenchmarkConfig config )
+    public IncrementalMemoryUsage( BenchmarkConfig config )
     {
 
         super( config );
@@ -68,7 +69,7 @@ public class MemoryUsage extends BenchmarkExecutor
     private static void printHeader( BufferedWriter writer ) throws IOException
     {
 
-        writer.write( "HashFunction,Algorithm,Nodes,Bytes" );
+        writer.write( "HashFunction,Algorithm,Nodes,RemovalRate,Bytes" );
         writer.newLine();
 
     }
@@ -79,13 +80,14 @@ public class MemoryUsage extends BenchmarkExecutor
      * @param function     the selected hash function
      * @param factory      the benchmarked algorithm
      * @param nodesCount   number of nodes of the cluster
+     * @param removalRate  rate of 
      * @param bytes        the measured amount of memory in bytes
      * @param writer       the writer to use
      */
     public static void printMetrics(
         String function, String algorithm,
-        int nodesCount, long bytes,
-        BufferedWriter writer
+        int nodesCount, float removalRate,
+        long bytes, BufferedWriter writer
     ) throws IOException
     {
 
@@ -94,6 +96,8 @@ public class MemoryUsage extends BenchmarkExecutor
         writer.write( algorithm );
         writer.write( ',' );
         writer.write( String.valueOf(nodesCount)) ;
+        writer.write( ',');
+        writer.write( String.valueOf(removalRate)) ;
         writer.write( ',');
         writer.write( String.valueOf(bytes) );
         writer.newLine();
@@ -114,22 +118,26 @@ public class MemoryUsage extends BenchmarkExecutor
         {
 
             final List<HashFunction> functions = BenchmarkExecutionUtils.getHashFunctions( config );
+            final String[] removalRates = BenchmarkExecutionUtils.getIncrementalRates( config );
             
             printHeader( writer );
             for( HashFunction function : functions )
                 for( ConsistentHashFactory factory : factories )
                     for( int nodesCount : config.getCommon().getInitNodes() )
-                    {
+                        for( String rate : removalRates )
+                        {
 
-                        final List<Node> nodes = SimpleNode.create(nodesCount);
-                        final ConsistentHash consistentHash = factory.createConsistentHash( function, nodes );
-                        BenchmarkExecutionUtils.removeNodesIfNeeded( config, consistentHash, nodes );
-                        
-                        final long bytes = GraphLayout.parseInstance( consistentHash.engine() ).totalSize();
-                        printMetrics( function.name(), factory.getConfig().getName(), nodesCount, bytes, writer );
+                            final List<Node> nodes = SimpleNode.create(nodesCount);
+                            final ConsistentHash consistentHash = factory.createConsistentHash( function, nodes );
 
-                        writer.flush();
-                    }
+                            final float removalRate = Float.parseFloat( rate );
+                            BenchmarkExecutionUtils.removeNodes( consistentHash, nodes, removalRate );
+                            
+                            final long bytes = GraphLayout.parseInstance( consistentHash.engine() ).totalSize();
+                            printMetrics( function.name(), factory.getConfig().getName(), nodesCount, removalRate, bytes, writer );
+
+                            writer.flush();
+                        }
 
         }
 

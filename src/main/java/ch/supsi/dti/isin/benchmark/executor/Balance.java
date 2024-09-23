@@ -4,10 +4,11 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import ch.supsi.dti.isin.benchmark.adapter.ConsistentHashFactory;
 import ch.supsi.dti.isin.benchmark.config.BenchmarkConfig;
@@ -186,20 +187,16 @@ public class Balance extends BenchmarkExecutor
     }
 
     /**
-     * Returns a map relating each node to an unique index.
+     * Returns the set of nodes to use.
      * 
      * @param nodesCount number of nodes to create
-     * @return a map relating each node to an unique index
+     * @return the set of nodes to use
      */
-    private Map<Node,Integer> getNodes( int nodesCount )
+    private List<Node> getNodes( int nodesCount )
     {
 
         final List<Node> nodes = SimpleNode.create( nodesCount );
-        final Map<Node,Integer> indexMap = new HashMap<>( nodesCount );
-        for( int i = 0; i < nodesCount; ++i )
-            indexMap.put( nodes.get(i), i );
-
-        return indexMap;
+        return nodes;
 
     }
 
@@ -222,10 +219,13 @@ public class Balance extends BenchmarkExecutor
     {
 
         final String algorithm = factory.getConfig().getName();
-        final Metrics metrics = new Metrics( function.name(), algorithm, nodesCount, distribution, keysCount, iterations );
+        final List<Node> nodes = getNodes( nodesCount );
 
-        final Map<Node,Integer> nodes = getNodes( nodesCount );
-        final ConsistentHash consistentHash = factory.createConsistentHash( function, nodes.keySet() );
+        final ConsistentHash consistentHash = factory.createConsistentHash( function, nodes );
+        final List<Node> removed = BenchmarkExecutionUtils.removeNodesIfNeeded( config, consistentHash, nodes );
+        nodes.removeAll( removed );
+
+        final Metrics metrics = new Metrics( function.name(), algorithm, nodes, distribution, keysCount, iterations );
 
         for( int i = 0; i < iterations; ++i )
         {
@@ -247,7 +247,7 @@ public class Balance extends BenchmarkExecutor
             keyGenerator.stream().limit( keysCount ).forEach( key ->
             {
                 final Node node = consistentHash.getNode(key);
-                metrics.collect( iteration, nodes.get(node) );
+                metrics.collect( iteration, node );
             });
 
             final long end = System.currentTimeMillis();
@@ -289,7 +289,7 @@ public class Balance extends BenchmarkExecutor
         private final int keysCount;
 
         /** Keeps the count of keys for each node. */
-        private final int[][] counts;
+        private final ArrayList<Map<Node,AtomicInteger>> counts;
 
 
         /**
@@ -297,14 +297,14 @@ public class Balance extends BenchmarkExecutor
          *
          * @param function     the hash function this metrics refer to
          * @param algorithm    the algorithm this metrics refer to
-         * @param nodesCount   number of nodes
+         * @param nodes        set of available nodes
          * @param distribution keys distribution
          * @param keysCount    number of values to collect
          * @param iterations   number of times the benchmark is repeated
          */
         public Metrics(
                 String function, String algorithm,
-                int nodesCount, Distribution distribution,
+                List<Node> nodes, Distribution distribution,
                 int keysCount, int iterations
         )
         {
@@ -315,7 +315,16 @@ public class Balance extends BenchmarkExecutor
             this.algorithm = algorithm;
             this.keysCount = keysCount;
             this.distribution = distribution;
-            this.counts = new int[iterations][nodesCount];
+            this.counts = new ArrayList<>( iterations );
+
+            for( int i = 0; i < iterations; ++i )
+            {
+
+                final Map<Node,AtomicInteger> countMap = new HashMap<>();
+                nodes.forEach( n -> countMap.put(n,new AtomicInteger()) );
+                counts.add( countMap );
+
+            }
 
         }
 
@@ -324,10 +333,10 @@ public class Balance extends BenchmarkExecutor
          *
          * @param nodeIndex index of the node to collect
          */
-        public void collect( int iteration, int nodeIndex )
+        public void collect( int iteration, Node node )
         {
 
-            counts[iteration][nodeIndex]++;
+            counts.get( iteration ).get( node ).incrementAndGet();
 
         }
 
@@ -339,7 +348,7 @@ public class Balance extends BenchmarkExecutor
         public double getMinCount()
         {
 
-            return getMinCount( counts.length );
+            return getMinCount( counts.size() );
 
         }
 
@@ -353,10 +362,11 @@ public class Balance extends BenchmarkExecutor
         public double getMinCount( int iterations )
         {
 
-            return Arrays.stream( counts )
+            return counts.stream()
                     .limit( iterations )
                     .mapToInt( iter ->
-                        Arrays.stream( iter )
+                        iter.values().stream()
+                            .mapToInt( AtomicInteger::get )
                             .min()
                             .orElseThrow()
                     )
@@ -373,7 +383,7 @@ public class Balance extends BenchmarkExecutor
         public double getMaxCount()
         {
 
-            return getMaxCount( counts.length );
+            return getMaxCount( counts.size() );
 
         }
 
@@ -387,10 +397,11 @@ public class Balance extends BenchmarkExecutor
         public double getMaxCount( int iterations )
         {
 
-            return Arrays.stream( counts )
+            return counts.stream()
                     .limit( iterations )
                     .mapToInt( iter ->
-                        Arrays.stream( iter )
+                        iter.values().stream()
+                            .mapToInt( AtomicInteger::get )
                             .max()
                             .orElseThrow()
                     )
@@ -436,7 +447,7 @@ public class Balance extends BenchmarkExecutor
          */
         public int getIterations()
         {
-            return counts.length;
+            return counts.size();
         }
 
         /**
@@ -456,7 +467,7 @@ public class Balance extends BenchmarkExecutor
          */
         public int getNodesCount()
         {
-            return counts[0].length;
+            return counts.get(0).size();
         }
 
     }

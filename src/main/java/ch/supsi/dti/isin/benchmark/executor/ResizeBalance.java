@@ -306,7 +306,16 @@ public class ResizeBalance extends BenchmarkExecutor
         final int addableCount = (initSize * 3 / 2) - consistentHash.nodeCount();
         final int number = random.nextInt( addableCount ) + 1;
         final List<Node> toAdd = new LinkedList<>();
-        if( consistentHash.supportsRandomRemovals() )
+        if( consistentHash.supportsOnlyLifoRemovals() )
+        {
+
+            for( int i = 0; i < number; ++ i )
+                toAdd.add( removed.get(i) );
+
+            removed.removeAll( toAdd );
+
+        }
+        else
         {
 
             for( int i = 0; i < number; ++ i )
@@ -320,15 +329,8 @@ public class ResizeBalance extends BenchmarkExecutor
             }
 
         }
-        else
-        {
+        
 
-            for( int i = 0; i < number; ++ i )
-                toAdd.add( removed.get(i) );
-
-            removed.removeAll( toAdd );
-
-        }
                 
         active.addAll( toAdd );
         consistentHash.addNodes( toAdd );
@@ -349,7 +351,23 @@ public class ResizeBalance extends BenchmarkExecutor
         final int removableCount = consistentHash.nodeCount() - (initSize /2);
         final int number = random.nextInt( removableCount ) + 1;
         final List<Node> toRemove = new LinkedList<>();
-        if( consistentHash.supportsRandomRemovals() )
+        if( consistentHash.supportsOnlyLifoRemovals() )
+        {
+
+            for( int i = 0; i < number; ++ i )
+            {
+                final int index = active.size() - (i + 1);
+                toRemove.add( active.get(index) );
+            }
+
+            removed.addAll( toRemove );
+            active.removeAll( toRemove );
+            consistentHash.removeNodes( toRemove );
+
+            Collections.sort( removed );
+
+        }
+        else
         {
 
             for( int i = 0; i < number; ++ i )
@@ -366,23 +384,7 @@ public class ResizeBalance extends BenchmarkExecutor
             consistentHash.removeNodes( toRemove );
 
         }
-        else
-        {
-
-            for( int i = 0; i < number; ++ i )
-            {
-                final int index = active.size() - (i + 1);
-                toRemove.add( active.get(index) );
-            }
-
-            removed.addAll( toRemove );
-            active.removeAll( toRemove );
-            consistentHash.removeNodes( toRemove );
-
-            Collections.sort( removed );
-
-        }
-
+        
     }
 
     /* *************** */

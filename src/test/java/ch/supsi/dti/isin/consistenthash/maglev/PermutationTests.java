@@ -39,10 +39,11 @@ public class PermutationTests
     public void a_permutation_should_visit_all_the_values()
     {
 
-        final Permutation permutation = new Permutation( "node", ConsistentHash.DEFAULT_HASH_FUNCTION, 10 );
-        final Set<Integer> remaining = IntStream.range( 0, 10 ).boxed().collect( Collectors.toSet() );
+        final int primeSize = 11;
+        final Permutation permutation = new Permutation( "node", ConsistentHash.DEFAULT_HASH_FUNCTION, primeSize );
+        final Set<Integer> remaining = IntStream.range( 0, primeSize ).boxed().collect( Collectors.toSet() );
 
-        for( int i = 0; i < 10; ++ i )
+        for( int i = 0; i < 11; ++ i )
         {
 
             final int value = permutation.next();

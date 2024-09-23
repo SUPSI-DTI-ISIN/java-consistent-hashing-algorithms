@@ -35,11 +35,12 @@ import ch.supsi.dti.isin.key.KeyGenerator;
 
 /**
  * Benchmarks the time needed for a consistent hashing algorithm to lookup a key.
+ * This version of the lookup time benchmark fixes the size of the cluster
+ * and increases the rate of removed nodes.
  * 
  * @author Massimo Coluzzi
- * @author Samuel De Babo Martins
  */
-public class LookupTime extends BenchmarkExecutor
+public class IncrementalLookupTime extends BenchmarkExecutor
 {
 
     
@@ -48,7 +49,7 @@ public class LookupTime extends BenchmarkExecutor
      *
      * @param config  configuration to use to setup the current benchmark
      */
-    public LookupTime( BenchmarkConfig config )
+    public IncrementalLookupTime( BenchmarkConfig config )
     {
 
         super( config );
@@ -74,6 +75,7 @@ public class LookupTime extends BenchmarkExecutor
         final String[] distributions = BenchmarkExecutionUtils.getKeyDistributions( config );
         final String[] functions     = BenchmarkExecutionUtils.getHashFunctionNames( config );
         final String[] initNodes     = BenchmarkExecutionUtils.getInitNodes( config );
+        final String[] removalRates  = BenchmarkExecutionUtils.getIncrementalRates( config );
         final String[] algorithms    = BenchmarkExecutionUtils.getAlgorithms( factories );
 
         final CommonConfig common = config.getCommon();
@@ -81,13 +83,14 @@ public class LookupTime extends BenchmarkExecutor
         final IterationsConfig iterations = common.getIterations();
                 
         final Options opt = new OptionsBuilder()
-            .include( LookupTime.LookupTimeExecutor.class.getCanonicalName() )
+            .include( IncrementalLookupTime.IncrementalLookupTimeExecutor.class.getCanonicalName() )
 
             .param( "benchmark", benchmarks )
             .param( "function", functions )
             .param( "initNodes", initNodes )
             .param( "algorithm", algorithms )
             .param( "distribution", distributions )
+            .param( "removalRate", removalRates )
 
             .resultFormat( ResultFormatType.CSV )
             .result( file.toString() )
@@ -132,7 +135,7 @@ public class LookupTime extends BenchmarkExecutor
      * @author Massimo Coluzzi
      */
     @State(Scope.Benchmark)
-    public static class LookupTimeExecutor
+    public static class IncrementalLookupTimeExecutor
     {
 
         /** Name of the current benchmark. */
@@ -154,6 +157,10 @@ public class LookupTime extends BenchmarkExecutor
         /** Statistical key distribution. */
         @Param({})
         private Distribution distribution;
+
+        /** The portion of nodes to remove. */
+        @Param({})
+        private float removalRate;
 
         /** The keys to use during the benchmark. */
         private Iterator<String> keys;
@@ -181,7 +188,6 @@ public class LookupTime extends BenchmarkExecutor
         public void setup( JMHConfigWrapper wrapper )
         {
             
-            final BenchmarkConfig benchmarkConfig = BenchmarkExecutionUtils.getBenchmarkConfig( wrapper.getConfig(), benchmark );
             final AlgorithmConfig algorithmConfig = BenchmarkExecutionUtils.getAlgorithmConfig( wrapper.getConfig(), algorithm );
             
             final ConsistentHashFactory factory = BenchmarkExecutionUtils.getFactory( algorithmConfig );
@@ -189,11 +195,10 @@ public class LookupTime extends BenchmarkExecutor
             final List<Node> nodes = SimpleNode.create( initNodes );
 
             final ConsistentHash consistentHash = factory.createConsistentHash( hashFunction, nodes );
-            BenchmarkExecutionUtils.removeNodesIfNeeded( benchmarkConfig, consistentHash, nodes );
+            BenchmarkExecutionUtils.removeNodes( consistentHash, nodes, removalRate );
 
             this.keys = KeyGenerator.create(distribution).iterator();
             this.pilot = factory.createEnginePilot( consistentHash );
-
             
         }
 

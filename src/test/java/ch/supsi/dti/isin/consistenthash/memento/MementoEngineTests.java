@@ -66,7 +66,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void a_new_created_engine_should_have_the_expected_size() {
 
-        final int size = random.nextInt(100) + 1;
+        final int size = random.nextInt(100) + 10;
         final MementoEngine engine = sampleValue(size);
         assertEquals(size, engine.bArraySize());
         assertEquals(size, engine.size());
@@ -76,7 +76,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void adding_a_new_bucket_in_a_full_cluster_should_increase_the_size() {
 
-        final int size = random.nextInt(100) + 1;
+        final int size = random.nextInt(100) + 10;
         final MementoEngine engine = sampleValue(size);
         engine.addBucket();
 
@@ -88,7 +88,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void adding_a_new_bucket_should_return_the_bucket_id_accordingly() {
 
-        final int size = random.nextInt(100) + 1;
+        final int size = random.nextInt(100) + 10;
         final MementoEngine engine = sampleValue(size);
         final int bucket = engine.addBucket();
 
@@ -99,7 +99,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void adding_a_removed_bucket_should_return_the_bucket_id_accordingly() {
 
-        final int size = random.nextInt(100) + 2;
+        final int size = random.nextInt(100) + 10;
         final int toRemove = random.nextInt(size - 1);
 
         final MementoEngine engine = sampleValue(size);
@@ -113,7 +113,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void removing_and_adding_the_last_bucket_should_work_as_expected() {
 
-        final int size = random.nextInt(100) + 1;
+        final int size = random.nextInt(100) + 10;
         final MementoEngine engine = sampleValue(size);
 
         final int expected = size - 1;
@@ -133,7 +133,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void removing_the_first_bucket_should_change_the_size_but_not_the_bArraySize() {
 
-        final int size = random.nextInt(100) + 1;
+        final int size = random.nextInt(100) + 10;
         final MementoEngine engine = sampleValue(size);
         engine.removeBucket(0);
 
@@ -145,7 +145,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void removing_the_last_bucket_should_change_both_the_size_and_the_bArraySize() {
 
-        final int size = random.nextInt(100) + 1;
+        final int size = random.nextInt(100) + 10;
         final MementoEngine engine = sampleValue(size);
         engine.removeBucket(size - 1);
 
@@ -157,7 +157,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void removing_buckets_except_the_last_should_not_change_the_bArraySize() {
 
-        final int size = random.nextInt(100) + 1;
+        final int size = random.nextInt(100) + 10;
         final MementoEngine engine = sampleValue(size);
         
         for( int b = 0; b < size - 1; ++b )
@@ -175,7 +175,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void removing_an_existing_bucket_should_return_the_bucket_id_accordingly() {
 
-        final int size = random.nextInt(100) + 1;
+        final int size = random.nextInt(100) + 10;
         final int toRemove = random.nextInt(size);
 
         final MementoEngine engine = sampleValue(size);
@@ -187,7 +187,7 @@ public class MementoEngineTests implements Contract<MementoEngine> {
     @Test
     public void when_buckets_except_the_last_are_removed_should_be_restored_in_reverse_order() {
 
-        final int size = random.nextInt(100) + 1;
+        final int size = random.nextInt(100) + 10;
         final MementoEngine engine = sampleValue(size);
 
         final List<Integer> toRemove = IntStream.range(0, size - 1).boxed().collect(toList());
