@@ -141,10 +141,11 @@ public class PowerHash implements ConsistentHash
     /**
      * {@inheritDoc}}
      */
-    public boolean supportsRandomRemovals()
+    @Override
+    public boolean supportsOnlyLifoRemovals()
     {
 
-        return false;
+        return true;
 
     }
 

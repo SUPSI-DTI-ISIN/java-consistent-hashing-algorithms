@@ -224,7 +224,7 @@ public interface ConsistentHashFactoryContract<F extends ConsistentHashFactory> 
         }
 
         @Override
-        public boolean supportsRandomRemovals()
+        public boolean supportsOnlyLifoRemovals()
         {
             throw new UnsupportedOperationException("Unimplemented method 'supportsRandomRemovals'");
         }
