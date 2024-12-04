@@ -110,7 +110,7 @@ public class ResizeBalance extends BenchmarkExecutor
     public static void printHeader( BufferedWriter writer ) throws IOException
     {
 
-        writer.write( "HashFunction,Algorithm,Keys,Distribution,Nodes,Iterations,Min,Max,Expected,Min%,Max%" );
+        writer.write( "HashFunction,Algorithm,Keys,Distribution,Nodes,Iterations,Min,Max,Expected,Min%,Max%,Var" );
         writer.newLine();
 
     }
@@ -152,6 +152,8 @@ public class ResizeBalance extends BenchmarkExecutor
         writer.write( String.valueOf(min * nodes / keys) );
         writer.write( ',' );
         writer.write( String.valueOf(max * nodes / keys) );
+        writer.write(',');
+        writer.write(String.valueOf(metrics.getVariance()));
         writer.newLine();
 
     }
@@ -524,6 +526,36 @@ public class ResizeBalance extends BenchmarkExecutor
                 })
                 .average()
                 .getAsDouble();
+
+        }
+        
+                /**
+         * Returns the variance across all the iterations.
+         *
+         * @return variance
+         */
+        public double getVariance() {
+            return getVariance(counts.length);
+        }
+
+        /**
+         * Returns the variance for the given number of iterations
+         *
+         * @param iterations number of iterations to evaluate
+         * @return variance
+         */
+        public double getVariance(int iterations) {
+            int mean = keysCount / getNodesCount();
+            return Arrays.stream(counts)
+                    .limit(iterations)
+                    .mapToDouble(iter
+                            -> Arrays.stream(iter)
+                            .map(n -> n - mean)
+                            .map(n -> n * n)
+                            .mapToDouble(n -> n).average().getAsDouble()
+                    )
+                    .average()
+                    .orElseThrow();
 
         }
 

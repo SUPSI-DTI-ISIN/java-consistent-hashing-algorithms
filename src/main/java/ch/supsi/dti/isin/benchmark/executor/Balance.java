@@ -142,7 +142,7 @@ public class Balance extends BenchmarkExecutor
     private void printHeader( BufferedWriter writer ) throws IOException
     {
 
-        writer.write( "HashFunction,Algorithm,Keys,Distribution,Nodes,Iterations,Min,Max,Expected,Min%,Max%" );
+        writer.write( "HashFunction,Algorithm,Keys,Distribution,Nodes,Iterations,Min,Max,Expected,Min%,Max%,Var" );
         writer.newLine();
 
     }
@@ -182,6 +182,8 @@ public class Balance extends BenchmarkExecutor
         writer.write(String.valueOf(min * nodes / keys));
         writer.write(',');
         writer.write(String.valueOf(max * nodes / keys));
+        writer.write(',');
+        writer.write(String.valueOf(metrics.getVariance()));
         writer.newLine();
 
     }
@@ -404,6 +406,37 @@ public class Balance extends BenchmarkExecutor
                             .mapToInt( AtomicInteger::get )
                             .max()
                             .orElseThrow()
+                    )
+                    .average()
+                    .orElseThrow();
+
+        }
+        
+        /**
+         * Returns the variance across all the iterations.
+         *
+         * @return variance
+         */
+        public double getVariance() {
+            return getVariance(counts.size());
+        }
+
+        /**
+         * Returns the variance for the given number of iterations
+         *
+         * @param iterations number of iterations to evaluate
+         * @return variance
+         */
+        public double getVariance(int iterations) {
+            int mean = keysCount / getNodesCount();
+            return counts.stream()
+                    .limit(iterations)
+                    .mapToDouble(iter
+                            -> iter.values().stream()
+                            .mapToInt( AtomicInteger::get )
+                            .map(n -> n - mean)
+                            .map(n -> n * n)
+                            .mapToDouble(n -> n).average().getAsDouble()
                     )
                     .average()
                     .orElseThrow();
