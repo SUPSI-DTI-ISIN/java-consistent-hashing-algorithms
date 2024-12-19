@@ -78,36 +78,6 @@ public class PowerEngine implements BucketBasedEngine
         final long hash = hashFunction.hash( key );
         final Random random = new Random( hash );
 
-        // final int h = (int)(hash ^ (hash >> 1));
-        // final int r1 = h & m1;
-        // if( r1 < size )
-        //     return r1;
-        
-        // final int hm = m >> 1;
-        // final int x = random.nextInt( hm );
-        // if( x < size - hm )
-        //     return k( hash );
-
-        // // final int r2 = g( hash, random );
-        // // if( r2 > this.m2 )
-        // //     return r2;
-
-        // return h & m2;
-
-        // final int r1 = f( hash, this.m1, random );
-        // if( r1 < size )
-        //     return r1;
-        
-        // final int p = random.nextInt( size );
-        // if( p > m2 )
-        //     return k( hash );
-        // // final int r2 = g( hash, random );
-        // // if( r2 > this.m2 )
-        // //     return r2;
-
-        // return f( hash, this.m2, random );
-
-
         final int r1 = f( hash, this.m1, random );
         if( r1 < size )
             return r1;
@@ -212,14 +182,30 @@ public class PowerEngine implements BucketBasedEngine
     /* ***************** */
 
 
-    // /**
-    //  * The function {@code f} as described in the paper.
-    //  * 
-    //  * @param hash   the hash of the key.
-    //  * @param mx     one of {@link #m1} or {@link #m2}.
-    //  * @param random the pseudo-random generator to use.
-    //  * @return the intermediate bucket.
-    //  */
+    /**
+     * Linear congruential generator to create uniformly
+     * distributed values.
+     * 
+     * @param value the value to rehash
+     * @param seed the seed to use
+     * @return the rehashed value
+     */
+    public long rehash( long value, int seed )
+    {
+        
+        final long hash = 2862933555777941757L * value + 1;
+        return (hash * hash * seed) >>> 32;
+
+    }
+
+    /**
+     * The function {@code f} as described in the paper.
+     * 
+     * @param hash   the hash of the key.
+     * @param mx     one of {@link #m1} or {@link #m2}.
+     * @param random the pseudo-random generator to use.
+     * @return the intermediate bucket.
+     */
     private int f( long hash, int mx, Random random )
     {
 
@@ -228,12 +214,10 @@ public class PowerEngine implements BucketBasedEngine
             return 0;
 
         final int h = Integer.highestOneBit( kBits );
-        // random.setSeed( hash ^ h );
-        // random.nextInt();
-        
-        // return h + random.nextInt( h );
 
-        final long h2 = hashFunction.hash( hash, h );
+        final long h2 = rehash( hash, h );
+        // final long h2 = hashFunction.hash( hash, h );
+
         final int h3 = (int) h2 & (h -1);
 
         return h + h3;
@@ -250,12 +234,12 @@ public class PowerEngine implements BucketBasedEngine
     private int g( long hash, Random random )
     {
 
-        LinearCongruentialGenerator generator = new LinearCongruentialGenerator( hash );
+        final LinearCongruentialGenerator generator = new LinearCongruentialGenerator( hash );
 
         int candidate = m2;
         int next;
 
-        // Jump from bucket to bucket until we go out of range
+        /* Jump from bucket to bucket until we go out of range */
         while( true ){
             next = (int) ((candidate + 1) / generator.nextDouble());
             if (next >= 0 && next < size) {
@@ -267,82 +251,51 @@ public class PowerEngine implements BucketBasedEngine
 
     }
 
-    // /**
-    //  * The function {@code g} as described in the paper.
-    //  * 
-    //  * @param hash   the hash of the key.
-    //  * @param random the pseudo-random generator to use.
-    //  * @return the intermediate bucket.
-    //  */
-    // private int k( long hash )
-    // {
 
-    //     LinearCongruentialGenerator generator = new LinearCongruentialGenerator( hash );
+    /* *************** */
+    /*  INNER CLASSES  */
+    /* *************** */
 
-    //     final int hm = m >> 1;
-    //     final int limit = size - hm;
-    //     int candidate = 0;
-    //     int next;
 
-    //     // Jump from bucket to bucket until we go out of range
-    //     while( true ){
-    //         next = (int) ((candidate + 1) / generator.nextDouble());
-    //         if (next >= 0 && next < limit) {
-    //             candidate = next;
-    //         } else {
-    //             return candidate + hm;
-    //         }
-    //     }
+    /**
+     * Random value generator copied from {@link com.google.common.hash.Hashing}.
+     * 
+     * @author Massimo Coluzzi
+     */
+    private static final class LinearCongruentialGenerator
+    {
 
-    // }
-
-    // /**
-    //  * The function {@code g} as described in the paper.
-    //  * 
-    //  * @param hash   the hash of the key.
-    //  * @param random the pseudo-random generator to use.
-    //  * @return the intermediate bucket.
-    //  */
-    // private int g( long hash, Random random )
-    // {
-
-    //      /* Initially, x is set to the value of m/2-1 */
-    //     int x = this.m2;
-
-    //     while( true )
-    //     {
-
-    //         /* 1. Generate U. */
-    //         final double u = random.nextDouble();
-
-    //         /* 2. Compute r = min{j: U>(x+1)/(j+1) */
-    //         final int r = (int) Math.ceil((x + 1) / u) - 1;
-
-    //         /* 3. Set x = r if r < n */
-    //         if( r < size )
-    //             x = r;
-    //         else
-    //             /*
-    //              * Otherwise, the algorithm returns the current
-    //              * value of x as the result.
-    //              */
-    //             return x;
-
-    //     }
-
-    // }
-
-    private static final class LinearCongruentialGenerator {
+        /** Internal state. */
         private long state;
     
-        public LinearCongruentialGenerator(long seed) {
-          this.state = seed;
+        /**
+         * Constructor with paramenters.
+         * 
+         * @param seed initial seed.
+         */
+        public LinearCongruentialGenerator( long seed )
+        {
+
+            super();
+
+            this.state = seed;
+
         }
     
-        public double nextDouble() {
+        /**
+         * Returns the next value in the pseudo-random sequence.
+         * 
+         * @return the next value in the pseudo-random sequence.
+         */
+        public double nextDouble()
+        {
+
           state = 2862933555777941757L * state + 1;
+          
           return ((double) ((int) (state >>> 33) + 1)) / 0x1.0p31;
+
         }
-      }
+
+    }
 
 }

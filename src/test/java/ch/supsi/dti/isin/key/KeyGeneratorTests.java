@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Iterator;
+
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,27 @@ public class KeyGeneratorTests
             final KeyGenerator generator = assertDoesNotThrow( () -> KeyGenerator.create(dist) );
             assertNotNull( generator );
 
+        }
+
+    }
+
+    @Test
+    public void test_key_generation_times()
+    {
+
+        for( Distribution dist : Distribution.values() )
+        {
+
+            final KeyGenerator generator = KeyGenerator.create( dist );
+            final Iterator<String> iter = generator.iterator();
+            
+            final long before = System.currentTimeMillis();
+            for( int i = 0; i < 1000_000; ++i )
+                iter.next();
+            final long after = System.currentTimeMillis();
+
+            System.out.printf( "Generating %s distribution took %d\n", dist, (after - before) );
+            
         }
 
     }
