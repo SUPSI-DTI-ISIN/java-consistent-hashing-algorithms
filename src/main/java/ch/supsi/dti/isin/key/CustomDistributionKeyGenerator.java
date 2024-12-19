@@ -1,18 +1,15 @@
 package ch.supsi.dti.isin.key;
 
-import org.nerd4j.utils.lang.Equals;
-import org.nerd4j.utils.lang.Hashcode;
-import org.nerd4j.utils.lang.Require;
-import org.nerd4j.utils.lang.ToString;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.ZipInputStream;
+
+import org.nerd4j.utils.lang.Equals;
+import org.nerd4j.utils.lang.Hashcode;
+import org.nerd4j.utils.lang.Require;
+import org.nerd4j.utils.lang.ToString;
 
 
 /**
@@ -22,7 +19,7 @@ import java.util.zip.ZipInputStream;
  *
  * @author Massimo Coluzzi
  */
-public class CustomDistributionKeyGenerator implements KeyGenerator
+public class CustomDistributionKeyGenerator extends AbstractKeyGenerator
 {
 
     /** Path to the source file used to load the keys. */
@@ -32,97 +29,20 @@ public class CustomDistributionKeyGenerator implements KeyGenerator
     /** Source of the key distribution. */
     private URL source;
 
-    /** Keys that will be returned by the generator. */
-    private final String[] data;
-
 
     /**
      * Constructor with parameters.
      *
-     * @param url the path of the file to load.
+     * @param url the path of the file to load
+     * @param size the size of the base dataset to create
      */
-    public CustomDistributionKeyGenerator( URL url )
+    public CustomDistributionKeyGenerator( URL url, int size  )
     {
 
-        super();
+        super( loadData(url, size) );
 
-        this.source = Require.nonNull( url, "The dataset file name is mandatory" );
-        this.data = loadData();
+        this.source = url;
         
-    }
-
-
-    /* **************** */
-    /*  PUBLIC METHODS  */
-    /* **************** */
-
-
-    /**
-     * Returns the number of keys loaded from file.
-     * 
-     * @return the original number of keys.
-     */
-    public int size()
-    {
-
-        return data.length;
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Stream<String> stream()
-    {
-
-        final Iterator<String> iter = iterator();
-        return Stream.generate( iter::next );
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterator<String> iterator()
-    {
-
-        return new Iterator<>()
-        {
-
-            /** The index of the current key. */
-            private int i = -1;
-
-            /** Number of times the data array was read. */
-            private int iteration = 0;
-
-            /** The prefix to add to each key. */
-            private String prefix = "0";
-
-            
-            @Override
-            public boolean hasNext()
-            {
-                return true;
-            }
-
-            @Override
-            public String next()
-            {
-
-                if( ++i >= data.length )
-                {
-                    i = 0;
-                    iteration += 1;
-                    prefix = String.valueOf( iteration );
-                }
-
-                return prefix + data[i];
-
-            }
-
-        };
-
     }
 
 
@@ -134,10 +54,15 @@ public class CustomDistributionKeyGenerator implements KeyGenerator
     /**
      * Loads the data from the given source into an array of keys.
      * 
+     * @param source the path of the file to load
+     * @param size the size of the base dataset to create
      * @return array of keys to use in the generator
      */
-    private String[] loadData()
+    private static String[] loadData( URL source, int size )
     {
+
+        Require.nonNull( source, "The source file to load is mandatory" );
+        Require.toHold( size > 0, "The size of the base dataset must be strictly positive" );
 
         try(
             final ZipInputStream zis = new ZipInputStream( source.openStream() );
@@ -148,8 +73,7 @@ public class CustomDistributionKeyGenerator implements KeyGenerator
             /* We expect the zip file to have only one entry. */
             zis.getNextEntry();
             return reader.lines()
-                    .limit( Integer.MAX_VALUE )
-                    .collect( Collectors.toList() )
+                    .limit( size )
                     .toArray( String[]::new );
 
         }catch( IOException ex )

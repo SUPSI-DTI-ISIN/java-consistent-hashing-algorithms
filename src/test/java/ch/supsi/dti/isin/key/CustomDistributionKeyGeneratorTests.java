@@ -2,7 +2,9 @@ package ch.supsi.dti.isin.key;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.nerd4j.utils.lang.RequirementFailure;
 
 
@@ -44,7 +47,7 @@ public class CustomDistributionKeyGeneratorTests implements KeyGeneratorContract
     public CustomDistributionKeyGenerator sampleValue()
     {
 
-        return new CustomDistributionKeyGenerator( url );
+        return new CustomDistributionKeyGenerator( url, KeyGenerator.DEFAULT_SIZE );
 
     }
 
@@ -54,11 +57,21 @@ public class CustomDistributionKeyGeneratorTests implements KeyGeneratorContract
 
 
     @NullSource
-    @ParameterizedTest(name="CustomDistributionKeyGenerator({0}) -> RequirementFailure")
+    @ParameterizedTest(name="CustomDistributionKeyGenerator({0},10) -> RequirementFailure")
     public void constructor_needs_a_file_name( URL file )
     {
 
-        assertThrows( RequirementFailure.class, () -> new CustomDistributionKeyGenerator(file) );
+        assertThrows( RequirementFailure.class, () -> new CustomDistributionKeyGenerator(file, 10) );
+
+    }
+
+    @ValueSource(ints={-10,-1,0})
+    @ParameterizedTest(name="CustomDistributionKeyGenerator(file,{0}) -> RequirementFailure")
+    public void size_must_be_greater_than_0( int size ) throws MalformedURLException 
+    {
+
+        final URL file = Path.of(".").toUri().toURL();
+        assertThrows( RequirementFailure.class, () -> new CustomDistributionKeyGenerator(file, size) );
 
     }
 
@@ -67,7 +80,7 @@ public class CustomDistributionKeyGeneratorTests implements KeyGeneratorContract
     {
 
         final URL notExistentFile = CustomDistributionKeyGeneratorTests.class.getResource("/my-unexisting.file");
-        assertThrows( RequirementFailure.class, () -> new CustomDistributionKeyGenerator( notExistentFile ));
+        assertThrows( RequirementFailure.class, () -> new CustomDistributionKeyGenerator( notExistentFile, 10 ));
 
     }
 

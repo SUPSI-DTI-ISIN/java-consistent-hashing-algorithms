@@ -17,6 +17,9 @@ import org.nerd4j.utils.lang.Require;
 public interface KeyGenerator
 {
 
+    /** The default size of the key base dataset. */
+    public static final int DEFAULT_SIZE = 20_000_000;
+
 
     /* ***************** */
     /*  FACTORY METHODS  */
@@ -32,18 +35,32 @@ public interface KeyGenerator
     static KeyGenerator create( Distribution distribution )
     {
 
+        return create( distribution, DEFAULT_SIZE );
+        
+    }
+
+    /**
+     * Creates a new key generator with the given distribution.
+     *
+     * @param distribution the distribution of the values in the dataset
+     * @param size the size of the base dataset
+     * @return a new key generator
+     */
+    static KeyGenerator create( Distribution distribution, int size )
+    {
+
         switch( Require.nonNull(distribution, "The distribution is mandatory") )
         {
 
             case NORMAL:
-                return new RealDistributionKeyGenerator( new NormalDistribution() );
+                return new RealDistributionKeyGenerator( new NormalDistribution(), size );
 
             case UNIFORM:
-                return new RealDistributionKeyGenerator(new UniformRealDistribution());
+                return new RealDistributionKeyGenerator(new UniformRealDistribution(), size );
 
             case CUSTOM:
                 final URL source = KeyGenerator.class.getResource( CustomDistributionKeyGenerator.SOURCE_PATH );
-                return new CustomDistributionKeyGenerator( source );
+                return new CustomDistributionKeyGenerator( source, size );
 
             default:
                 throw new IllegalArgumentException( "Unable to handle distribution of type " + distribution );
