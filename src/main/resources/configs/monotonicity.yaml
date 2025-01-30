@@ -63,7 +63,7 @@ common:
 # that implements the ConsistentHashFactory interface. Every entry in the list must provide
 # the algorithm name and an optional list of arguments to use during creation.
 algorithms:
-    - name: anchor
+    # - name: anchor
     #   args:
     #       # The value is multiplied by the number of initial active nodes to find the capacity.
     #       # E.g., capacity=10 means that the overall capacity of the cluster is 10 times the initial number of working nodes.
@@ -71,17 +71,21 @@ algorithms:
     #       capacity: 10
     - name: binomial
             # No arguments
-    - name: dx
+    - name: binomialnew
+            # No arguments
+    # - name: dx
     #   args: 
     #       # Same as above.
     #       capacity: 10
-    - name: jump
+    # - name: jump
     #       # No arguments
     - name: jumpback
           # No arguments
-    - name: memento
+    # - name: memento
     #       # No arguments
     - name: power
+          # No arguments
+    - name: powerold
           # No arguments
     
 

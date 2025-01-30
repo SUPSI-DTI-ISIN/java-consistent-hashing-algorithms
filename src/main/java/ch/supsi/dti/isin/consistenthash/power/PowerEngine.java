@@ -215,10 +215,10 @@ public class PowerEngine implements BucketBasedEngine
 
         final int h = Integer.highestOneBit( kBits );
 
-        final long h2 = rehash( hash, h );
-        // final long h2 = hashFunction.hash( hash, h );
+        // final long h2 = rehash( hash, h );
+        final long h2 = hashFunction.hash( hash, h );
 
-        final int h3 = (int) h2 & (h -1);
+        final int h3 = (int) h2 & (h-1);
 
         return h + h3;
         

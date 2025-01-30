@@ -282,7 +282,11 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
             final int to   = toMapping.get( i );
 
             if( from != to )
+            {
                 lists.get( to ).add( i );
+                if( to < fromSize )
+                    System.out.println( fromSize + "-" + toSize + "-> " + i );
+            }
         }
 
         int movedWrong = 0;
@@ -291,7 +295,7 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
             int m = lists.get( i ).size();
             movedWrong += m;
         }
-        assertEquals( movedWrong, 0 );
+        assertEquals( 0, movedWrong );
         
     }
 
@@ -310,5 +314,23 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
 
     }
 
+    @Test
+    public void debug_test()
+    {
+
+        final int fromSize = 4;
+        final int toSize = fromSize + 1;
+        
+        final BucketBasedEngine fromEngine = new BinomialEngine( fromSize, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
+        final BucketBasedEngine toEngine = new BinomialEngine( toSize, ConsistentHash.DEFAULT_HASH_FUNCTION ); 
+        
+        final String key = "195289";
+
+        final int from = fromEngine.getBucket( key );
+        final int to   = toEngine.getBucket( key );
+
+        assertEquals( from, to );
+
+    }
 
 }

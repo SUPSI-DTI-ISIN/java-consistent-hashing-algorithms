@@ -8,11 +8,11 @@ The implemented algorithms are:
 * [2014] __jump hash__ by [Lamping and Veach](https://arxiv.org/pdf/1406.2294.pdf)
 * [2015] __multi-probe hash__ by [Appleton and O’Reilly](https://arxiv.org/pdf/1505.00062.pdf)
 * [2016] __maglev hash__ by [D. E. Eisenbud](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/44824.pdf)
-* [2020] __anchor hash__ by [Gal Mendelson et al.](https://arxiv.org/pdf/1812.09674.pdf)
+* [2020] __anchor hash__ by [G. Mendelson et al.](https://arxiv.org/pdf/1812.09674.pdf)
 * [2021] __dx hash__ by [Chaos Dong and Fang Wang](https://arxiv.org/pdf/2107.07930.pdf)
 * [2023] __memento hash__ by [M. Coluzzi et al.](https://arxiv.org/pdf/2306.09783.pdf)
-* [2024] __flip hash__ by [Masson and LEE](https://arxiv.org/pdf/2402.17549)
-* [2024] __jumpback hash__ by [Otmar Ertl](https://arxiv.org/abs/2403.18682)
+* [2024] __flip hash__ by [Masson and Lee](https://arxiv.org/pdf/2402.17549)
+* [2024] __jumpback hash__ by [O. Ertl](https://arxiv.org/abs/2403.18682)
 * [2024] __binomial hash__ by [M. Coluzzi et al.](https://arxiv.org/pdf/2406.19836.pdf)
 
 
