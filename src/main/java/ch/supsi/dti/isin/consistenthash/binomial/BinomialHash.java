@@ -24,7 +24,7 @@ public class BinomialHash implements ConsistentHash
 
     /**
      * The {@code BinomialHash} algorithm engine as described in:
-     * {@code N/A}
+     * {@code https://arxiv.org/pdf/2406.19836}
      */
     private final BinomialEngine engine;
 

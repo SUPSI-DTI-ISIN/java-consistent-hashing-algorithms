@@ -6,7 +6,7 @@ import ch.supsi.dti.isin.hashfunction.HashFunction;
 
 /**
  * Implementation of the {@code BinomialHash} algorithm as described in the related paper:
- * {@code N/A}
+ * {@code https://arxiv.org/pdf/2406.19836}
  * 
  * <p>
  * <b>IMPORTANT:</b>
@@ -23,18 +23,18 @@ public class BinomialEngine implements BucketBasedEngine
     private int size;
 
     /**
-     * This value is used to filter values in the range {@code [0,upperTreeCapacity-1]}
-     * where the term {@code upperTreeCapacity} identifies the capacity of the smallest
+     * This value is used to filter values in the range {@code [0,enclosingTreeCapacity-1]}
+     * where the term {@code enclosingTreeCapacity} identifies the capacity of the smallest
      * binary tree capable of containing the cluster size.
      */
-    private int upperTreeFilter;
+    private int enclosingTreeFilter;
 
     /**
-     * This value is used to filter values in the range {@code [0,lowerTreeCapacity-1]}
-     * where the term {@code lowerTreeCapacity} identifies the capacity of the biggest
+     * This value is used to filter values in the range {@code [0,minorTreeCapacity-1]}
+     * where the term {@code minorTreeCapacity} identifies the capacity of the biggest
      * binary tree incapable of containing the cluster size.
      */    
-    private int lowerTreeFilter;
+    private int minorTreeFilter;
 
     /** Hashing function to use. */
     private final HashFunction hashFunction;
@@ -58,8 +58,8 @@ public class BinomialEngine implements BucketBasedEngine
         if( size > highestOneBit )
             highestOneBit = highestOneBit << 1;
 
-        this.upperTreeFilter = highestOneBit - 1;
-        this.lowerTreeFilter = this.upperTreeFilter >> 1;
+        this.enclosingTreeFilter = highestOneBit - 1;
+        this.minorTreeFilter = this.enclosingTreeFilter >> 1;
         
     }
 
@@ -77,7 +77,7 @@ public class BinomialEngine implements BucketBasedEngine
      * @param seed the seed to use
      * @return the rehashed value
      */
-    public long rehash( long value, int seed )
+    private long rehash( long value, int seed )
     {
         
         final long hash = 2862933555777941757L * value + 1;
@@ -92,7 +92,7 @@ public class BinomialEngine implements BucketBasedEngine
      * @param hash   the hash of the key mapped to the bucket
      * @return a random position inside the same tree level
      */
-    public int relocateInsideLevel( int bucket, long hash )
+    private int relocateWithinLevel( int bucket, long hash )
     {
 
         /*
@@ -134,29 +134,29 @@ public class BinomialEngine implements BucketBasedEngine
         /* We get the hash of the provided key. */
         final long hash = hashFunction.hash( key );
         
-        /* We get a position within the upper tree based on the value of the key hash. */
-        int bucket = (int) hash & upperTreeFilter;
+        /* We get a position within the enclosing tree based on the value of the key hash. */
+        int bucket = (int) hash & enclosingTreeFilter;
 
         /* We relocate the bucket randomly inside the same tree level. */
-        bucket = relocateInsideLevel( bucket, hash );
+        bucket = relocateWithinLevel( bucket, hash );
 
         /* If the final position is valid, we return it. */
         if( bucket < size )
             return bucket;
 
         /*
-         * Otherwise, we get a new random position in the upper tree
-         * and return it if in the range [lowerTreeFilter+1,size-1].
+         * Otherwise, we get a new random position in the enclosing tree
+         * and return it if in the range [minorTreeFilter+1,size-1].
          * We repeat the operation twice (if needed) to get a better balance.
          */
         long h = hash;
         for( int i = 0; i < 4; ++i )
         {
 
-            h = rehash( h, upperTreeFilter );
-            bucket = (int) h & upperTreeFilter;
+            h = rehash( h, enclosingTreeFilter );
+            bucket = (int) h & enclosingTreeFilter;
             
-            if( bucket <= lowerTreeFilter )
+            if( bucket <= minorTreeFilter )
                 break;
 
             if( bucket < size )
@@ -166,11 +166,11 @@ public class BinomialEngine implements BucketBasedEngine
 
         /*
          * Finally, if none of the previous operations succeed,
-         * we remap the key in the range covered by the lower tree,
+         * we remap the key in the range covered by the minor tree,
          * which is guaranteed valid.
          */
-        bucket = (int) hash & lowerTreeFilter;
-        return relocateInsideLevel( bucket, hash );
+        bucket = (int) hash & minorTreeFilter;
+        return relocateWithinLevel( bucket, hash );
 
     }
 
@@ -182,10 +182,10 @@ public class BinomialEngine implements BucketBasedEngine
     {
         
         final int newBucket = size;
-        if( ++size > upperTreeFilter )
+        if( ++size > enclosingTreeFilter )
         {
-            this.upperTreeFilter = (this.upperTreeFilter << 1) | 1;
-            this.lowerTreeFilter = (this.lowerTreeFilter << 1) | 1;
+            this.enclosingTreeFilter = (this.enclosingTreeFilter << 1) | 1;
+            this.minorTreeFilter = (this.minorTreeFilter << 1) | 1;
         }
 
         return newBucket;
@@ -199,10 +199,10 @@ public class BinomialEngine implements BucketBasedEngine
     public int removeBucket( int b )
     {
         
-        if( --size <= lowerTreeFilter )
+        if( --size <= minorTreeFilter )
         {
-            this.lowerTreeFilter = this.lowerTreeFilter >> 1;
-            this.upperTreeFilter = this.upperTreeFilter >> 1;
+            this.minorTreeFilter = this.minorTreeFilter >> 1;
+            this.enclosingTreeFilter = this.enclosingTreeFilter >> 1;
         }
 
         return size;
@@ -222,26 +222,26 @@ public class BinomialEngine implements BucketBasedEngine
     }
 
     /**
-     * Returns the {@code upperTreeFilter} as described in the paper.
+     * Returns the {@code enclosingTreeFilter} as described in the paper.
      * 
-     * @return the {@code upperTreeFilter} as described in the paper.
+     * @return the {@code enclosingTreeFilter} as described in the paper.
      */
-    public long upperTreeFilter()
+    public long enclosingTreeFilter()
     {
 
-        return upperTreeFilter;
+        return enclosingTreeFilter;
 
     }
 
     /**
-     * Returns the {@code lowerTreeFilter} as described in the paper.
+     * Returns the {@code minorTreeFilter} as described in the paper.
      * 
-     * @return the {@code lowerTreeFilter} as described in the paper.
+     * @return the {@code minorTreeFilter} as described in the paper.
      */
-    public long lowerTreeFilter()
+    public long minorTreeFilter()
     {
 
-        return lowerTreeFilter;
+        return minorTreeFilter;
 
     }
 

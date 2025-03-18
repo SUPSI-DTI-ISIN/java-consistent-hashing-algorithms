@@ -76,20 +76,24 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
         final BinomialEngine engine = sampleValue( size );
         assertEquals(size, engine.size());
 
-        int expectedSmallCapacity = Integer.highestOneBit( size ) - 1;
-        assertEquals( expectedSmallCapacity, engine.lowerTreeFilter() );
-        assertEquals( (expectedSmallCapacity << 1) | 1, engine.upperTreeFilter() );
+        int m = Integer.highestOneBit( size );
+        if( size == m )
+            m = m >> 1;
+            
+        int expectedMinorTreeFilter = m - 1;
+        assertEquals( expectedMinorTreeFilter, engine.minorTreeFilter() );
+        assertEquals( (expectedMinorTreeFilter << 1) | 1, engine.enclosingTreeFilter() );
 
     }
 
     @Test
-    public void adding_a_new_bucket_when_size_lt_upperTreeFilter_should_increase_the_size_but_not_upperTreeFilter()
+    public void adding_a_new_bucket_when_size_lt_enclosingTreeFilter_should_increase_the_size_but_not_enclosingTreeFilter()
     {
 
         int size = random.nextInt( 100 ) + 1;
-        final int lowerTreeFilter = Integer.highestOneBit( size ) - 1;
-        final int upperTreeFilter = (lowerTreeFilter << 1) | 1;
-        if( size == upperTreeFilter )
+        final int minorTreeFilter = Integer.highestOneBit( size ) - 1;
+        final int enclosingTreeFilter = (minorTreeFilter << 1) | 1;
+        if( size == enclosingTreeFilter )
             size += 1;
         
         final BinomialEngine engine = sampleValue( size );
@@ -98,15 +102,15 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
         assertEquals( size + 1, engine.size() );
 
         final int expectedSmallCapacity = Integer.highestOneBit( size ) - 1;
-        assertEquals( expectedSmallCapacity, engine.lowerTreeFilter() );
+        assertEquals( expectedSmallCapacity, engine.minorTreeFilter() );
 
         final int expectedTreeCapacity  = (expectedSmallCapacity << 1) | 1;
-        assertEquals( expectedTreeCapacity, engine.upperTreeFilter() );
+        assertEquals( expectedTreeCapacity, engine.enclosingTreeFilter() );
 
     }
 
     @Test
-    public void adding_a_new_bucket_when_size_eq_upperTreeFilter_should_increase_both_the_size_and_upperTreeFilter()
+    public void adding_a_new_bucket_when_size_eq_enclosingTreeFilter_should_increase_both_the_size_and_enclosingTreeFilter()
     {
 
         int size = random.nextInt( 100 ) + 1;
@@ -114,15 +118,15 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
         
         final BinomialEngine engine = sampleValue( size );
         assertEquals( size, engine.size() );
-        assertEquals( size, engine.upperTreeFilter() );
+        assertEquals( size, engine.enclosingTreeFilter() );
 
         engine.addBucket();
 
         assertEquals( size + 1, engine.size() );
-        assertEquals( size, engine.lowerTreeFilter() );
+        assertEquals( size, engine.minorTreeFilter() );
 
         final int expectedTreeCapacity = (size << 1) | 1;
-        assertEquals( expectedTreeCapacity, engine.upperTreeFilter() );
+        assertEquals( expectedTreeCapacity, engine.enclosingTreeFilter() );
 
     }
 
@@ -139,7 +143,7 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
     }
 
     @Test
-    public void removing_a_bucket_when_size_gt_lowerTreeFilter_plus_1_should_decrease_the_size_but_not_the_capacity()
+    public void removing_a_bucket_when_size_gt_minorTreeFilter_plus_1_should_decrease_the_size_but_not_the_capacity()
     {
 
         int size = random.nextInt( 100 ) + 4;
@@ -150,19 +154,19 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
 
         final BinomialEngine engine = sampleValue( size + 1 );
         assertEquals( size + 1, engine.size() );
-        assertEquals( expectedTreeCapacity, engine.upperTreeFilter() );
-        assertEquals( expectedSmallCapacity, engine.lowerTreeFilter() );
+        assertEquals( expectedTreeCapacity, engine.enclosingTreeFilter() );
+        assertEquals( expectedSmallCapacity, engine.minorTreeFilter() );
 
         engine.removeBucket( 0 );
 
         assertEquals( size, engine.size() );
-        assertEquals( expectedTreeCapacity, engine.upperTreeFilter() );
-        assertEquals( expectedSmallCapacity, engine.lowerTreeFilter() );
+        assertEquals( expectedTreeCapacity, engine.enclosingTreeFilter() );
+        assertEquals( expectedSmallCapacity, engine.minorTreeFilter() );
 
     }
 
     @Test
-    public void removing_a_bucket_when_size_eq_upperTreeFilter_plus_1_should_decrease_both_size_and_upperTreeFilter()
+    public void removing_a_bucket_when_size_eq_enclosingTreeFilter_plus_1_should_decrease_both_size_and_enclosingTreeFilter()
     {
 
         int size = random.nextInt( 100 ) + 1;
@@ -172,8 +176,8 @@ public class BinomialEngineTests implements Contract<BinomialEngine>
 
         engine.removeBucket( 0 );
         assertEquals( size-1, engine.size() );
-        assertEquals( size-1, engine.upperTreeFilter() );
-        assertEquals( (size-1)>>1, engine.lowerTreeFilter() );
+        assertEquals( size-1, engine.enclosingTreeFilter() );
+        assertEquals( (size-1)>>1, engine.minorTreeFilter() );
 
     }
 
