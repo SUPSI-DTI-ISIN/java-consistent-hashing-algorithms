@@ -155,6 +155,7 @@ public class BinomialEngine implements BucketBasedEngine
 
             h = rehash( h, enclosingTreeFilter );
             bucket = (int) h & enclosingTreeFilter;
+            bucket = relocateWithinLevel( bucket, h );
             
             if( bucket <= minorTreeFilter )
                 break;
